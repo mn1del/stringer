@@ -82,9 +82,12 @@ def main():
     
             while True:
                 if result:  # you can check if the reset was successful
+                    print("successful reset")
                     break
                 else:
-                    continue
+                    print("try reset again")
+                    result = hx.reset()  # Before we start, reset the hx711 ( not necessary)
+
             print(str(hx.get_weight_mean(50)) + ' g') 
 
     except (KeyboardInterrupt, SystemExit):
