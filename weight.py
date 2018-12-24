@@ -3,6 +3,7 @@
 
 from hx711 import HX711
 import RPi.GPIO as GPIO
+import argparse
 
 def main():
     try:
@@ -20,10 +21,13 @@ def main():
         else:
             print('not ready')
     
-        # Read data several, or only one, time and return median value
+        # Read data several, or only one, time and return value
         # it just returns exactly the number which hx711 sends
         # argument times is not required default value is 1
-        data = hx.get_raw_data_median(times=1)
+        if ARGS["median"]:
+            data = hx.get_raw_data_median(times=1)
+        else:
+            data = hx.get_raw_data_mean(times=1)
         
         if data != False:  # always check if you get correct value or only False
             print('Raw data: ' + str(data))
@@ -32,13 +36,16 @@ def main():
     
         # measure tare and save the value as offset for current channel
         # and gain selected. That means channel A and gain 64
-        result = hx.zero(times=99)
+        result = hx.zero(times=ARGS["times"])
     
-        # Read data several, or only one, time and return median value.
-        # It subtracts offset value for particular channel from the median value.
+        # Read data several, or only one, time and return avg value.
+        # It subtracts offset value for particular channel from the avg value.
         # This value is still just a number from HX711 without any conversion
         # to units such as grams or kg.
-        data = hx.get_data_median(times=10)
+        if ARGS["median"]:
+            data = hx.get_data_median(times=ARGS["times"])
+        else:
+            data = hx.get_data_mean(times=ARGS["times"])
     
         if data  != False:  # always check if you get correct value or only False
             # now the value is close to 0
@@ -51,7 +58,11 @@ def main():
         # you must have known weight.
         input('Put known weight on the scale and then press Enter')
         #hx.set_debug_mode(True)
-        data = hx.get_data_median(times=99)
+        if ARGS["median"]:
+            data = hx.get_data_median(times=ARGS["times"])
+        else:
+            data = hx.get_data_mean(times=ARGS["times"])
+
         if data != False:
             print('Mean value from HX711 subtracted by offset: ' + str(data))
             known_weight_grams = input('Write how many grams it was and press Enter: ')
@@ -71,9 +82,9 @@ def main():
             hx.set_scale_ratio(scale_ratio=ratio)    # set ratio for current channel
             print('Ratio is set.')
         else:
-            raise ValueError('Cannot calculate median value. Try debug mode.')
+            raise ValueError('Cannot calculate avg value. Try debug mode.')
     
-        # Read data several, or only one, time and return median value
+        # Read data several, or only one, time and return avg value
         # subtracted by offset and converted by scale ratio to 
         # desired units. In my case in grams.
         # print('Current weight on the scale in grams is: ')
@@ -86,13 +97,23 @@ def main():
                 else:
                     result = hx.reset()  # Before we start, reset the hx711 ( not necessary)
 
-            print(str(hx.get_weight_median(99)) + ' g') 
+            if ARGS["median"]:
+                print(str(hx.get_weight_median(ARGS["times"])) + ' g') 
+            else:
+                print(str(hx.get_weight_mean(ARGS["times"])) + ' g') 
 
     except (KeyboardInterrupt, SystemExit):
         print('Bye :)')
         
     finally:
+        print("Cleanup")
         GPIO.cleanup()
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--times", type=int, default=10)
+    parser.add_argument("--median", action="store_true")
+    ARGS = vars(parser.parse_args([
+        "--times", 
+        "--median"]))
     main()
