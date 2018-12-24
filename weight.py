@@ -15,7 +15,7 @@ def main():
 
         result = hx.reset()  # Before we start, reset the hx711 ( not necessary)
 
-    if result:  # you can check if the reset was successful
+    if result == True:  # you can check if the reset was successful
         print('Ready to use')
     else:
         print('not ready')
