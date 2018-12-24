@@ -342,6 +342,51 @@ class HX711:
 		return signed_data
 	
 	############################################################
+	# get_raw_data_median returns median value of readings.	   #
+	# If return False something is wrong. Try debug mode.	   #
+	# INPUTS: times # how many times to read data. Default 1   #
+	# OUTPUTS: INT | BOOL					   #
+	############################################################
+	def get_raw_data_median(self, times=1):
+		backup_channel = self._current_channel 		# do backup of current channel befor reading for later use
+		backup_gain = self._gain_channel_A		# backup of gain channel A
+		if times > 0 and times < 100:		# check if times is in required range 
+			data_list = []			# create empty list
+			for i in range(times):		# for number of times read and add up all readings.
+				data_list.append(self._read())	# append every read value to the list
+			if times > 2 and self._pstdev_filter:			# if times is > 2 filter the data
+				data_pstdev = stat.pstdev(data_list)	# calculate population standard deviation from the data
+				data_median = stat.median(data_list)	# calculate median from the collected data
+				max_num = data_median + data_pstdev	# calculate max number which is within pstdev
+				min_num = data_median - data_pstdev	# calculate min number which is within pstdev
+				filtered_data = []			# create new list for filtered data
+				
+				if data_pstdev <=100:			# is pstdev is less than 100 it is ok
+					self._save_last_raw_data(backup_channel, backup_gain, data_median)	# save last data
+					return data_median		# just return the calculated median
+
+				for index,num in enumerate(data_list):	# now I know that pstdev is greater then iterate through the list
+					if (num > min_num and num < max_num):	# check if the number is within pstdev
+						filtered_data.append(num)	# then append to the filtered data list
+				if self._debug_mode:
+					print('data_list: ' + str(data_list))
+					print('filtered_data lsit: ' + str(filtered_data))
+					print('pstdev data: ' + str(data_pstdev))
+					print('pstdev filtered data: ' + str(stat.pstdev(filtered_data)))
+					print('median data_list: ' + str(stat.median(data_list)))
+					print('median filtered_data: ' + str(stat.median(filtered_data)))
+				f_data_median = stat.median(filtered_data)		# calculate median from filtered data
+				self._save_last_raw_data(backup_channel, backup_gain, f_data_median)	# save last data
+				return f_data_median		# return median from filtered data
+			else: 
+				data_median = stat.median(data_list)		# calculate median from the list
+				self._save_last_raw_data(backup_channel, backup_gain, data_median)	# save last data
+				return data_median		# times was 2 or less just return median
+		else:
+			raise ValueError('function "get_raw_data_median" parameter "times" has to be in range 1 up to 99.\n I have got: '\
+						+ str(times))
+
+	############################################################
 	# get_raw_data_mean returns mean value of readings.	   #
 	# If return False something is wrong. Try debug mode.	   #
 	# INPUTS: times # how many times to read data. Default 1   #
@@ -425,6 +470,45 @@ class HX711:
 		else:
 			return False
 	
+	############################################################
+	# get_data_median returns average value of readings minus    #
+	# offset for the particular channel which was read.	   #
+	# If return False something is wrong. Try debug mode.	   #
+	# INPUTS: times # how many times to read data. Default 1   #
+	# OUTPUTS: INT | BOOL					   #
+	############################################################
+	def get_data_median(self, times=1):
+		result = self.get_raw_data_median(times)
+		if result != False:
+			if self._current_channel =='A' and self._gain_channel_A == 128:
+				return result- self._offset_A_128
+			elif self._current_channel == 'A' and self._gain_channel_A == 64:
+				return result - self._offset_A_64
+			else:
+				return result - self._offset_B
+		else:
+			return False
+	
+	############################################################
+	# get_weight_median returns average value of readings minus  #
+	# offset divided by scale ratio for a particular channel   #
+	# and gain.						   #
+	# If return False something is wrong. Try debug mode.	   #
+	# INPUTS: times # how many times to read data. Default 1   #
+	# OUTPUTS: INT | BOOL 					   #
+	############################################################
+	def get_weight_median(self, times=1):
+		result = self.get_raw_data_median(times)
+		if result != False:
+			if self._current_channel =='A' and self._gain_channel_A == 128:
+				return (result - self._offset_A_128) / self._scale_ratio_A_128
+			elif self._current_channel == 'A' and self._gain_channel_A == 64:
+				return (result - self._offset_A_64) / self._scale_ratio_A_64
+			else:
+				return (result - self._offset_B) / self._scale_ratio_B
+		else:
+			return False
+
 	############################################################
 	# get current channel returns the value of currently	   #
 	# chosen channel					   #
