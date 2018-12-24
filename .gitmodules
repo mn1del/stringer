@@ -1,0 +1,3 @@
+[submodule "HX711"]
+	path = HX711
+	url = https://github.com/gandalf15/HX711.git
