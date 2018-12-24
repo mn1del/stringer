@@ -20,10 +20,10 @@ def main():
         else:
             print('not ready')
     
-        # Read data several, or only one, time and return mean value
+        # Read data several, or only one, time and return median value
         # it just returns exactly the number which hx711 sends
         # argument times is not required default value is 1
-        data = hx.get_raw_data_mean(times=1)
+        data = hx.get_raw_data_median(times=1)
         
         if data != False:  # always check if you get correct value or only False
             print('Raw data: ' + str(data))
@@ -34,11 +34,11 @@ def main():
         # and gain selected. That means channel A and gain 64
         result = hx.zero(times=99)
     
-        # Read data several, or only one, time and return mean value.
-        # It subtracts offset value for particular channel from the mean value.
+        # Read data several, or only one, time and return median value.
+        # It subtracts offset value for particular channel from the median value.
         # This value is still just a number from HX711 without any conversion
         # to units such as grams or kg.
-        data = hx.get_data_mean(times=10)
+        data = hx.get_data_median(times=10)
     
         if data  != False:  # always check if you get correct value or only False
             # now the value is close to 0
@@ -51,7 +51,7 @@ def main():
         # you must have known weight.
         input('Put known weight on the scale and then press Enter')
         #hx.set_debug_mode(True)
-        data = hx.get_data_mean(times=99)
+        data = hx.get_data_median(times=99)
         if data != False:
             print('Mean value from HX711 subtracted by offset: ' + str(data))
             known_weight_grams = input('Write how many grams it was and press Enter: ')
@@ -71,9 +71,9 @@ def main():
             hx.set_scale_ratio(scale_ratio=ratio)    # set ratio for current channel
             print('Ratio is set.')
         else:
-            raise ValueError('Cannot calculate mean value. Try debug mode.')
+            raise ValueError('Cannot calculate median value. Try debug mode.')
     
-        # Read data several, or only one, time and return mean value
+        # Read data several, or only one, time and return median value
         # subtracted by offset and converted by scale ratio to 
         # desired units. In my case in grams.
         # print('Current weight on the scale in grams is: ')
@@ -86,7 +86,7 @@ def main():
                 else:
                     result = hx.reset()  # Before we start, reset the hx711 ( not necessary)
 
-            print(str(hx.get_weight_mean(99)) + ' g') 
+            print(str(hx.get_weight_median(99)) + ' g') 
 
     except (KeyboardInterrupt, SystemExit):
         print('Bye :)')
