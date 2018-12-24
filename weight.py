@@ -32,7 +32,7 @@ def main():
     
         # measure tare and save the value as offset for current channel
         # and gain selected. That means channel A and gain 64
-        result = hx.zero(times=10)
+        result = hx.zero(times=99)
     
         # Read data several, or only one, time and return mean value.
         # It subtracts offset value for particular channel from the mean value.
@@ -51,7 +51,7 @@ def main():
         # you must have known weight.
         input('Put known weight on the scale and then press Enter')
         #hx.set_debug_mode(True)
-        data = hx.get_data_mean(times=10)
+        data = hx.get_data_mean(times=99)
         if data != False:
             print('Mean value from HX711 subtracted by offset: ' + str(data))
             known_weight_grams = input('Write how many grams it was and press Enter: ')
@@ -82,13 +82,11 @@ def main():
     
             while True:
                 if result:  # you can check if the reset was successful
-                    print("successful reset")
                     break
                 else:
-                    print("try reset again")
                     result = hx.reset()  # Before we start, reset the hx711 ( not necessary)
 
-            print(str(hx.get_weight_mean(50)) + ' g') 
+            print(str(hx.get_weight_mean(99)) + ' g') 
 
     except (KeyboardInterrupt, SystemExit):
         print('Bye :)')
