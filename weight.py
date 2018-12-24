@@ -104,7 +104,8 @@ def main():
             if ARGS["median"]:
                 print(str(hx.get_weight_median(ARGS["times"])) + ' g') 
             else:
-                print(str(hx.get_weight_mean(ARGS["times"])) + ' g') 
+                #print(str(hx.get_weight_mean(ARGS["times"])) + ' g') 
+                print(str(hx.get_raw_data_mean(times=1)) + ' g') 
 
     except (KeyboardInterrupt, SystemExit):
         print('Bye :)')
