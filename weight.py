@@ -57,7 +57,11 @@ def main():
         # In order to calculate the conversion ratio to some units, in my case I want grams,
         # you must have known weight.
         input('Put known weight on the scale and then press Enter')
-        #hx.set_debug_mode(True)
+        if ARGS["debug"]:
+            hx.set_debug_mode(True)
+        else:
+            hx.set_debug_mode(False)
+
         if ARGS["median"]:
             data = hx.get_data_median(times=ARGS["times"])
         else:
@@ -113,6 +117,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--times", nargs="?", const=10, default=10, required=False)
     parser.add_argument("-m", "--median", action="store_true")
+    parser.add_argument("-d", "--debug", action="store_true")
     ARGS = vars(parser.parse_args())
     print(ARGS)
     main()
