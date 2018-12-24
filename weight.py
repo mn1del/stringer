@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 
-from hx711 import HX711        # import the class HX711
-import RPi.GPIO as GPIO        # import GPIO
+from hx711 import HX711
+import RPi.GPIO as GPIO
 
 def main():
     try:
@@ -13,9 +13,9 @@ def main():
     # you can set a gain for channel A even though you want to currently select channel B
         hx = HX711(dout_pin=21, pd_sck_pin=20, gain_channel_A=128)
 
-        result = hx.reset()        # Before we start, reset the hx711 ( not necessary)
+        result = hx.reset()  # Before we start, reset the hx711 ( not necessary)
 
-    if result:            # you can check if the reset was successful
+    if result:  # you can check if the reset was successful
         print('Ready to use')
     else:
         print('not ready')
@@ -25,7 +25,7 @@ def main():
     # argument times is not required default value is 1
     data = hx.get_raw_data_mean(times=1)
     
-    if data != False:    # always check if you get correct value or only False
+    if data != False:  # always check if you get correct value or only False
         print('Raw data: ' + str(data))
     else:
         print('invalid data')
@@ -40,7 +40,7 @@ def main():
     # to units such as grams or kg.
     data = hx.get_data_mean(times=10)
 
-    if data  != False:    # always check if you get correct value or only False
+    if data  != False:  # always check if you get correct value or only False
         # now the value is close to 0
         print('Data subtracted by offset but still not converted to any unit: '\
              + str(data))
