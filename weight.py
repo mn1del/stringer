@@ -78,7 +78,14 @@ def main():
         # desired units. In my case in grams.
         # print('Current weight on the scale in grams is: ')
         while True:
-            print(str(hx.get_weight_mean(10)) + ' g') 
+            result = hx.reset()  # Before we start, reset the hx711 ( not necessary)
+    
+            while True:
+                if result:  # you can check if the reset was successful
+                    break
+                else:
+                    continue
+            print(str(hx.get_weight_mean(50)) + ' g') 
 
     except (KeyboardInterrupt, SystemExit):
         print('Bye :)')
