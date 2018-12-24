@@ -111,8 +111,8 @@ def main():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--times", default=10, required=False)
-    parser.add_argument("-med", "--median", action="store_true", required=False)
+    parser.add_argument("-t", "--times", nargs="?", default=10, required=False)
+    parser.add_argument("-med", "--median", nargs="?", action="store_true", required=False)
     ARGS = vars(parser.parse_args([
         "--times", 
         "--median"]))
