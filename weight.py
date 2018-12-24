@@ -76,8 +76,9 @@ def main():
         # Read data several, or only one, time and return mean value
         # subtracted by offset and converted by scale ratio to 
         # desired units. In my case in grams.
-        print('Current weight on the scale in grams is: ')
-        print(str(hx.get_weight_mean(6)) + ' g') 
+        # print('Current weight on the scale in grams is: ')
+        while True:
+            print(str(hx.get_weight_mean(10)) + ' g') 
 
     except (KeyboardInterrupt, SystemExit):
         print('Bye :)')
