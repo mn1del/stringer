@@ -50,7 +50,7 @@ def main():
         # In order to calculate the conversion ratio to some units, in my case I want grams,
         # you must have known weight.
         input('Put known weight on the scale and then press Enter')
-        #hx.set_debug_mode(True)
+        hx.set_debug_mode(True)
         data = hx.get_data_median(times=99)
         if data != False:
             print('Mean value from HX711 subtracted by offset: ' + str(data))
