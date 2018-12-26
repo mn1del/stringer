@@ -119,7 +119,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--times", nargs="?", const=10, default=10, required=False)
     parser.add_argument("-m", "--median", action="store_true")
     parser.add_argument("-d", "--debug", action="store_true")
-    parser.add_argument("-g", "--gain", nargs="?", const=128, default=128, choices=[64,128])
+    parser.add_argument("-g", "--gain", nargs="?", type=int, const=128, default=128, choices=[64,128])
     ARGS = vars(parser.parse_args())
     print(ARGS)
     main()
