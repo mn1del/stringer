@@ -12,7 +12,7 @@ def main():
     # If you do not pass any argument 'gain_channel_A' then the default value is 128
     # If you do not pass any argument 'set_channel' then the default value is 'A'
     # you can set a gain for channel A even though you want to currently select channel B
-        hx = HX711(dout_pin=29, pd_sck_pin=31, gain_channel_A=128)
+        hx = HX711(dout_pin=29, pd_sck_pin=31, gain_channel_A=ARGS["gain"])
 
         result = hx.reset()  # Before we start, reset the hx711 ( not necessary)
 
@@ -119,6 +119,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--times", nargs="?", const=10, default=10, required=False)
     parser.add_argument("-m", "--median", action="store_true")
     parser.add_argument("-d", "--debug", action="store_true")
+    parser.add_argument("-g", "--gain", nargs="?", const=128, default=128, choices=[64,128])
     ARGS = vars(parser.parse_args())
     print(ARGS)
     main()
