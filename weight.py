@@ -6,6 +6,9 @@ import pigpio
 import HX711
 
 
+def cbf(count, mode, reading):
+    print("callback: {}, {}, {}".format(count, mode, reading))
+
 class HX(HX711.sensor):
     def __init__(self, pi, DATA=5, CLOCK=6, mode=HX711.CH_B_GAIN_32, callback=cbf):
         super().__init__(pi, DATA=5, CLOCK=6, mode=HX711.CH_B_GAIN_32, callback=cbf)
@@ -21,8 +24,6 @@ class HX(HX711.sensor):
 
 if __name__ == "__main__":
 
-   def cbf(count, mode, reading):
-       print("callback: {}, {}, {}".format(count, mode, reading))
 
    pi = pigpio.pi()
    if not pi.connected:
@@ -73,6 +74,9 @@ if __name__ == "__main__":
 
       stop = time.time() + 3600
 
+      s.saven(0.1)
+      s.print10x(10)
+
       while time.time() < stop:
 
          count, mode, reading = s.get_reading()
@@ -80,6 +84,7 @@ if __name__ == "__main__":
          if count != c:
             c = count
             print("{} {} {}".format(count, mode, reading))
+            s.printnx(reading)
 
          time.sleep(0.05)
 
