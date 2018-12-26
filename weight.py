@@ -17,6 +17,7 @@ class HX(HX711.sensor):
         self.offset = reading
 
     def calibrate(self, known_weight, reading):
+        print(known_weight, reading, self.offset)
         self.slope = known_weight/(reading - self.offset)
 
     def get_weight(self, reading):
@@ -72,6 +73,7 @@ if __name__ == "__main__":
 
       c, mode, reading = s.get_reading()
       s.zero(reading)
+      time.sleep(0.05)
 
       known_weight_grams = float(input('Put know weight on the scales and enter weight here: '))
       c, mode, reading = s.get_reading()
