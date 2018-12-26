@@ -70,12 +70,10 @@ if __name__ == "__main__":
 
       print("Cancel callback and read manually")
 
-      input('Put known weight on the scale and then press Enter')
-
       c, mode, reading = s.get_reading()
       s.zero(reading)
 
-      known_weight_grams = input('Write how many grams it was and press Enter: ')
+      known_weight_grams = float(input('Put know weight on the scales and enter weight here: '))
       c, mode, reading = s.get_reading()
       s.calibrate(known_weight_grams, reading)
       print("Calibration slope: {}, Offset: {}",format(s.slope, s.offset))
