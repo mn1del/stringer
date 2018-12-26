@@ -72,16 +72,32 @@ if __name__ == "__main__":
       print("Cancel callback and read manually")
 
       c, mode, reading = s.get_reading()
-      s.zero(reading)
-      time.sleep(0.05)
+
+      while True:
+         count, mode, reading = s.get_reading()
+
+         if count != c:
+            c = count
+            s.zero(reading)
+            break
+
+         time.sleep(0.05)
 
       known_weight_grams = float(input('Put know weight on the scales and enter weight here: '))
+      while True:
+         count, mode, reading = s.get_reading()
+
+         if count != c:
+            c = count 
+            s.calibrate(known_weight_grams, reading)
+            print("Calibration slope: {}, Offset: {}",format(s.slope, s.offset))
+            break
+
+         time.sleep(0.05)
+
       c, mode, reading = s.get_reading()
-      s.calibrate(known_weight_grams, reading)
-      print("Calibration slope: {}, Offset: {}",format(s.slope, s.offset))
 
       stop = time.time() + 3600
-      
 
       while time.time() < stop:
 
