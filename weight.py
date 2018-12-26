@@ -90,7 +90,7 @@ if __name__ == "__main__":
          if count != c:
             c = count 
             s.calibrate(known_weight_grams, reading)
-            print("Calibration slope: {}, Offset: {}",format(s.slope, s.offset))
+            print("Calibration slope: {}, Offset: {}".format(s.slope, s.offset))
             break
 
          time.sleep(0.05)
