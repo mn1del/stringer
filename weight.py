@@ -35,6 +35,7 @@ if __name__ == "__main__":
 #      timestamp = time.time()
 #      reading = 1
       while True:
+          time.sleep(0.1)
           pass
 #          c,m,r = s.get_reading()
 #          if r != reading:
