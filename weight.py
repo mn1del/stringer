@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
       #time.sleep(1)
 
-      s.start()
+      #s.start()
 
       #print("Start")
 
@@ -117,11 +117,12 @@ if __name__ == "__main__":
 #            print("Weight: {} g".format(s.get_weight(reading)))
 #
 #         time.sleep(0.05)
-      while True:
           timestamp = time.time()
+      while True:
           c,m,r = s.get_reading()
-          print("{}s: {}".format(time.time()-timestamp, r))
-          time.sleep(0.1)
+          print("{}s: reading: {}, DOUT: {}, CLOCK: {}, ".format(
+              time.time()-timestamp, r, s.pi.read(s.DATA), s.pi.read(s.CLOCK)))
+          time.sleep(0.5)
           #pass
 
 
