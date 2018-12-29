@@ -13,7 +13,7 @@ X_128_CLK = 25
 X_32_CLK  = 26
 X_64_CLK  = 27
 
-PULSE_LEN = 15
+PULSE_LEN = 1
 
 # If the data line goes low after being high for at least
 # this long it indicates that a new reading is available.
@@ -172,7 +172,10 @@ class sensor:
 
    def _callback(self, gpio, level, tick):
       if gpio == self.CLOCK:
-         print("CLOCK change. Level: {}. DOUT level: {}".format(level, self._data_level)) 
+         print("{} CLOCK change. Level: {}. DOUT level: {}".format(
+             self._count,
+             level,
+             self._data_level)) 
 
          if level == 0:
 
@@ -204,7 +207,7 @@ class sensor:
                         self._skip_readings -= 1
 
       else:  # if triggered by data pin
-         print("DOUT change. Level: {}".format(level)) 
+         print("{} DOUT change. Level: {}".format(self._count, level)) 
 
          self._data_level = level
 
