@@ -172,11 +172,9 @@ class sensor:
 
    def _callback(self, gpio, level, tick):
       if gpio == self.CLOCK:
-         data = self.pi.read(self.DATA)
-         print("{} CLOCK change. Level: {}. DOUT level: {}".format(
+         print("{} CLOCK change. DOUT level: {}".format(
              self._count,
-             level,
-             data)) 
+             self._data_level)) 
 
          if level == 0:
 
@@ -184,7 +182,7 @@ class sensor:
 
             if self._clocks <= DATA_CLKS:
 
-               self._value = (self._value << 1) + data  #self._data_level
+               self._value = (self._value << 1) + self._data_level
 
                if self._clocks == DATA_CLKS:
 
@@ -213,7 +211,7 @@ class sensor:
              level,
              self._in_wave)) 
 
-         #self._data_level = level
+         self._data_level = level
 
          if not self._paused:
 
