@@ -86,7 +86,7 @@ class sensor:
       self._wid = pi.wave_create()
 
       self._cb1 = pi.callback(self.DATA, pigpio.EITHER_EDGE, self._callback)
-      self._cb2 = pi.callback(self.CLOCK, pigpio.FALLING_EDGE, self._callback)
+      #self._cb2 = pi.callback(self.CLOCK, pigpio.FALLING_EDGE, self._callback)
       self._cb2 = pi.callback(self.CLOCK, pigpio.EITHER_EDGE, self._callback)
 
       self.set_mode(mode)
@@ -174,7 +174,9 @@ class sensor:
    def _callback(self, gpio, level, tick):
       if gpio == self.CLOCK:
 
-         if level == 0:
+         if level == 1:
+            print("CLOCK up") 
+         elif level == 0:
             print("{} CLOCK down. DOUT level: {}".format(
                self._sent,
                self._data_level)) 
@@ -205,8 +207,6 @@ class sensor:
 
                      else:
                         self._skip_readings -= 1
-         else:
-            print("CLOCK up") 
 
       else:  # if triggered by data pin
          print("{} DOUT change. Level: {} {}".format(
