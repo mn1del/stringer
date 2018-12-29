@@ -117,8 +117,11 @@ if __name__ == "__main__":
 #            print("Weight: {} g".format(s.get_weight(reading)))
 #
 #         time.sleep(0.05)
-      #while True:
-          #c,m,r = s.get_reading()
+      while True:
+          timstamp = time.time()
+          c,m,r = s.get_reading()
+          print("{}s: {}".format(time.time()-timestamp(), r))
+          time.sleep(0.1)
           #pass
 
 
