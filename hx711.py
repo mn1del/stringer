@@ -171,6 +171,7 @@ class sensor:
    def _callback(self, gpio, level, tick):
 
       if gpio == self.CLOCK:
+          print("CLOCK change. Level: {}. DOUT level: {}".format(level, self._data_level)) 
 
          if level == 0:
 
@@ -201,18 +202,21 @@ class sensor:
                      else:
                         self._skip_readings -= 1
 
-      else:
+      else:  # if triggered by data pin
+          print("DOUT change. Level: {}".format(level)) 
 
          self._data_level = level
 
          if not self._paused:
 
-            if self._data_tick is not None:
-
-               current_edge_long = pigpio.tickDiff(
-                  self._data_tick, tick) > TIMEOUT
-
-            if current_edge_long and not self._previous_edge_long:
+#            if self._data_tick is not None:
+#
+#               current_edge_long = pigpio.tickDiff(
+#                  self._data_tick, tick) > TIMEOUT
+#               
+#
+#            if current_edge_long and not self._previous_edge_long:
+            if self._data_level == 0:
 
                if not self._in_wave:
 
