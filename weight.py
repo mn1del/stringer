@@ -34,8 +34,8 @@ if __name__ == "__main__":
 #      print("Initialized...")
 #      timestamp = time.time()
 #      reading = 1
-#      while True:
-#          pass
+      while True:
+          pass
 #          c,m,r = s.get_reading()
 #          if r != reading:
 #              newtime = time.time()
