@@ -172,7 +172,7 @@ class sensor:
 
    def _callback(self, gpio, level, tick):
       if gpio == self.CLOCK:
-         data = pi.read(self.DATA)
+         data = self.pi.read(self.DATA)
          print("{} CLOCK change. Level: {}. DOUT level: {}".format(
              self._count,
              level,
