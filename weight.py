@@ -73,15 +73,15 @@ if __name__ == "__main__":
 
       c, mode, reading = s.get_reading()
 
-      while True:
-         count, mode, reading = s.get_reading()
+#      while True:
+#         count, mode, reading = s.get_reading()
+#
+#         if count != c:
+#            c = count
+      s.zero(reading)
+#            break
 
-         if count != c:
-            c = count
-            s.zero(reading)
-            break
-
-         time.sleep(0.05)
+#         time.sleep(0.05)
 
       s.pause()   
 
