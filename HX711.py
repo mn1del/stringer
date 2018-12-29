@@ -173,7 +173,7 @@ class sensor:
    def _callback(self, gpio, level, tick):
       if gpio == self.CLOCK:
          print("{} CLOCK change. DOUT level: {}".format(
-             self._count,
+             self._sent,
              self._data_level)) 
 
          if level == 0:
@@ -207,7 +207,7 @@ class sensor:
 
       else:  # if triggered by data pin
          print("{} DOUT change. Level: {} {}".format(
-             self._count,
+             self._sent,
              level,
              self._in_wave)) 
 
