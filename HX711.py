@@ -207,7 +207,7 @@ class sensor:
                         self._skip_readings -= 1
 
       else:  # if triggered by data pin
-         print("{} DOUT change. Level: {}".format(self._count, level)) 
+         print("{} DOUT change. Level: {}".format(self._count, level, self._in_wave)) 
 
          self._data_level = level
 
