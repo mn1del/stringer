@@ -83,7 +83,12 @@ if __name__ == "__main__":
 
          time.sleep(0.05)
 
+      s.pause()   
+
       known_weight_grams = float(input('Put know weight on the scales and enter weight here: '))
+
+      s.start()
+
       c, mode, reading = s.get_reading()
       while True:
          count, mode, reading = s.get_reading()

@@ -22,7 +22,7 @@ TIMEOUT = ((X_64_CLK + 3) * 2 * PULSE_LEN)
 
 # The number of readings to skip after a mode change.
 
-SETTLE_READINGS = 5
+SETTLE_READINGS =3 
 
 import time
 
