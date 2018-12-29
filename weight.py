@@ -70,6 +70,7 @@ if __name__ == "__main__":
       print("Change mode to CH_A_GAIN_128")
 
       print("Cancel callback and read manually")
+      time.sleep(1)
 
       c, mode, reading = s.get_reading()
 
@@ -88,6 +89,7 @@ if __name__ == "__main__":
       known_weight_grams = float(input('Put know weight on the scales and enter weight here: '))
 
       s.start()
+      time.sleep(1)
 
       c, mode, reading = s.get_reading()
 #      while True:
