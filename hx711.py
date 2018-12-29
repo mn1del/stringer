@@ -63,7 +63,7 @@ class sensor:
       self._value = 0
 
       self._rmode = CH_A_GAIN_128
-      self._rval = 0
+      self._rval =1 
       self._count = 0
 
       self._sent = 0
