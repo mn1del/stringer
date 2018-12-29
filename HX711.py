@@ -174,7 +174,7 @@ class sensor:
       print("Callback! {}, {}, {}".format(gpio, level, tick))
 
       if gpio == self.CLOCK:
-          print("CLOCK change. Level: {}. DOUT level: {}".format(level, self._data_level)) 
+         print("CLOCK change. Level: {}. DOUT level: {}".format(level, self._data_level)) 
 
          if level == 0:
 
@@ -206,7 +206,7 @@ class sensor:
                         self._skip_readings -= 1
 
       else:  # if triggered by data pin
-          print("DOUT change. Level: {}".format(level)) 
+         print("DOUT change. Level: {}".format(level)) 
 
          self._data_level = level
 
