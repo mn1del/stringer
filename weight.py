@@ -70,35 +70,35 @@ if __name__ == "__main__":
       print("Change mode to CH_A_GAIN_128")
 
       print("Cancel callback and read manually")
-      time.sleep(1)
+#      time.sleep(1)
 
-      c, mode, reading = s.get_reading()
+#      c, mode, reading = s.get_reading()
 
 #      while True:
 #         count, mode, reading = s.get_reading()
 #
 #         if count != c:
 #            c = count
-      s.zero(reading)
+#     s.zero(reading)
 #            break
 
 #         time.sleep(0.05)
 
-      s.pause()   
+#      s.pause()   
 
-      known_weight_grams = float(input('Put know weight on the scales and enter weight here: '))
+#      known_weight_grams = float(input('Put know weight on the scales and enter weight here: '))
 
-      s.start()
-      time.sleep(1)
+#      s.start()
+#      time.sleep(1)
 
-      c, mode, reading = s.get_reading()
+#      c, mode, reading = s.get_reading()
 #      while True:
 #         count, mode, reading = s.get_reading()
 #
 #         if count != c:
 #            c = count 
-      s.calibrate(known_weight_grams, reading)
-      print("Calibration slope: {}, Offset: {}".format(s.slope, s.offset))
+#      s.calibrate(known_weight_grams, reading)
+#      print("Calibration slope: {}, Offset: {}".format(s.slope, s.offset))
 #            break
 #
 #         time.sleep(0.05)
