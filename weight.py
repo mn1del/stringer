@@ -11,6 +11,7 @@ def cbf(count, mode, reading):
 
 class HX(HX711.sensor):
     def __init__(self, pi, DATA=5, CLOCK=6, mode=HX711.CH_A_GAIN_128, callback=None):
+        print("test")
         super().__init__(pi=pi, DATA=DATA, CLOCK=CLOCK, mode=mode, callback=callback)
 
     def zero(self, zero_reading):
