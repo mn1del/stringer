@@ -42,6 +42,7 @@ if __name__ == "__main__":
               print("{}s: reading: {}".format(
                   round(newtime-timestamp, 3), reading))
               timestamp = newtime
+          time.sleep(0.5)    
 
    except KeyboardInterrupt:
       pass
