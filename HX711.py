@@ -13,7 +13,7 @@ X_128_CLK = 25
 X_32_CLK  = 26
 X_64_CLK  = 27
 
-PULSE_LEN = 10
+PULSE_LEN = 15
 
 # If the data line goes low after being high for at least
 # this long it indicates that a new reading is available.
