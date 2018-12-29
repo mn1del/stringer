@@ -74,6 +74,7 @@ class sensor:
       self._skip_readings = SETTLE_READINGS
 
       pi.write(CLOCK, 1) # Reset the sensor.
+      #pi.write(CLOCK, 1) # Reset the sensor.
 
       pi.set_mode(DATA, pigpio.INPUT)
 
@@ -169,6 +170,7 @@ class sensor:
          self._wid = None
 
    def _callback(self, gpio, level, tick):
+       print("Callback! {}, {}, {}".format(gpio, level, tick))
 
       if gpio == self.CLOCK:
           print("CLOCK change. Level: {}. DOUT level: {}".format(level, self._data_level)) 
