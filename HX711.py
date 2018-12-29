@@ -175,11 +175,12 @@ class sensor:
       if gpio == self.CLOCK:
 
          if level == 1:
-            print("CLOCK up") 
+             #print("CLOCK up") 
+            pass
          elif level == 0:
-            print("{} CLOCK down. DOUT level: {}".format(
-               self._sent,
-               self._data_level)) 
+#            print("{} CLOCK down. DOUT level: {}".format(
+#               self._sent,
+#               self._data_level)) 
 
             self._clocks += 1
 
@@ -209,10 +210,10 @@ class sensor:
                         self._skip_readings -= 1
 
       else:  # if triggered by data pin
-         print("{} DOUT change. Level: {} {}".format(
-             self._sent,
-             level,
-             self._in_wave)) 
+#         print("{} DOUT change. Level: {} {}".format(
+#             self._sent,
+#             level,
+#             self._in_wave)) 
 
          self._data_level = level
 
