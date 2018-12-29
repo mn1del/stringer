@@ -50,6 +50,7 @@ class sensor:
       the mode, and the reading.  The count is incremented for each
       new reading.
       """
+      print("Testing __init__")
       self.pi = pi
       self.DATA = DATA
       self.CLOCK = CLOCK

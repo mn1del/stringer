@@ -21,13 +21,11 @@ class HX(HX711.sensor):
         return self.slope * (reading - self.offset)
 
 if __name__ == "__main__":
-
-
    pi = pigpio.pi()
    if not pi.connected:
       exit(0)
 
-   s = HX(pi, DATA=5, CLOCK=6, mode=HX711.CH_A_GAIN_128, callback=None)
+   s = HX(pi, DATA=5, CLOCK=6, mode=HX711.CH_A_GAIN_128, callback=cbf)
 
    try:
       print("Initialized...")
