@@ -35,31 +35,31 @@ if __name__ == "__main__":
    #   pi, DATA=5, CLOCK=6, mode=HX711.CH_B_GAIN_32, callback=cbf)
 
    try:
-      print("start with CH_B_GAIN_32 and callback")
+      #print("start with CH_B_GAIN_32 and callback")
 
       #time.sleep(1)
 
       #s.set_mode(HX711.CH_A_GAIN_64)
 
-      print("Change mode to CH_A_GAIN_64")
+      #print("Change mode to CH_A_GAIN_64")
 
       #time.sleep(1)
 
       #s.set_mode(HX711.CH_A_GAIN_128)
 
-      print("Change mode to CH_A_GAIN_128")
+      #print("Change mode to CH_A_GAIN_128")
 
       #time.sleep(1)
 
      # s.pause()
 
-      print("Pause")
+      #print("Pause")
 
       #time.sleep(1)
 
       s.start()
 
-      print("Start")
+      #print("Start")
 
       #time.sleep(1)
 
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
       #s.set_mode(HX711.CH_A_GAIN_128)
 
-      print("Change mode to CH_A_GAIN_128")
+      #print("Change mode to CH_A_GAIN_128")
 
       print("Cancel callback and read manually")
 #      time.sleep(1)
@@ -117,9 +117,9 @@ if __name__ == "__main__":
 #            print("Weight: {} g".format(s.get_weight(reading)))
 #
 #         time.sleep(0.05)
-      while True:
+      #while True:
           #c,m,r = s.get_reading()
-          pass
+          #pass
 
 
    except KeyboardInterrupt:
