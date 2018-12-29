@@ -171,8 +171,6 @@ class sensor:
          self._wid = None
 
    def _callback(self, gpio, level, tick):
-      print("Callback! {}, {}, {}".format(gpio, level, tick))
-
       if gpio == self.CLOCK:
          print("CLOCK change. Level: {}. DOUT level: {}".format(level, self._data_level)) 
 
@@ -233,4 +231,4 @@ class sensor:
                   self._sent += 1
 
          self._data_tick = tick
-         self._previous_edge_long = current_edge_long
+         #self._previous_edge_long = current_edge_long
