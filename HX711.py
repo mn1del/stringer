@@ -87,6 +87,7 @@ class sensor:
 
       self._cb1 = pi.callback(self.DATA, pigpio.EITHER_EDGE, self._callback)
       self._cb2 = pi.callback(self.CLOCK, pigpio.FALLING_EDGE, self._callback)
+      self._cb2 = pi.callback(self.CLOCK, pigpio.EITHER_EDGE, self._callback)
 
       self.set_mode(mode)
 
@@ -172,11 +173,11 @@ class sensor:
 
    def _callback(self, gpio, level, tick):
       if gpio == self.CLOCK:
-         print("{} CLOCK change. DOUT level: {}".format(
-             self._sent,
-             self._data_level)) 
 
          if level == 0:
+            print("{} CLOCK down. DOUT level: {}".format(
+               self._sent,
+               self._data_level)) 
 
             self._clocks += 1
 
@@ -204,6 +205,8 @@ class sensor:
 
                      else:
                         self._skip_readings -= 1
+         else:
+            print("CLOCK up") 
 
       else:  # if triggered by data pin
          print("{} DOUT change. Level: {} {}".format(
