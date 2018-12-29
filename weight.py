@@ -118,7 +118,7 @@ if __name__ == "__main__":
 #
 #         time.sleep(0.05)
       while True:
-          timstamp = time.time()
+          timestamp = time.time()
           c,m,r = s.get_reading()
           print("{}s: {}".format(time.time()-timestamp(), r))
           time.sleep(0.1)
