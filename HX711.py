@@ -224,7 +224,7 @@ class sensor:
 #               
 #
 #            if current_edge_long and not self._previous_edge_long:
-            if data_level == 0:
+            if level == 0:
 
                if not self._in_wave:
 
