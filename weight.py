@@ -118,12 +118,15 @@ if __name__ == "__main__":
 #
 #         time.sleep(0.05)
       timestamp = time.time()
+      reading = 1
       while True:
           c,m,r = s.get_reading()
-          print("{}s: reading: {}, DOUT: {}, CLOCK: {}, ".format(
-              time.time()-timestamp, r, s.pi.read(s.DATA), s.pi.read(s.CLOCK)))
-          time.sleep(0.5)
-          #pass
+          if r != reading:
+              newtime = time.time()
+              reading = r
+              print("{}s: reading: {}".format(
+                  newtime-timestamp, reading))
+              timestamp = newtime
 
 
    except KeyboardInterrupt:
