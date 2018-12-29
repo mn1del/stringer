@@ -171,7 +171,7 @@ class sensor:
          self._wid = None
 
    def _callback(self, gpio, level, tick):
-       print("Callback! {}, {}, {}".format(gpio, level, tick))
+      print("Callback! {}, {}, {}".format(gpio, level, tick))
 
       if gpio == self.CLOCK:
           print("CLOCK change. Level: {}. DOUT level: {}".format(level, self._data_level)) 
