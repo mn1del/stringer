@@ -84,8 +84,8 @@ class sensor:
 
       self._wid = pi.wave_create()
 
-      self._cb1 = pi.callback(DATA, pigpio.EITHER_EDGE, self._callback)
-      self._cb2 = pi.callback(CLOCK, pigpio.FALLING_EDGE, self._callback)
+      self._cb1 = pi.callback(self.DATA, pigpio.EITHER_EDGE, self._callback)
+      self._cb2 = pi.callback(self.CLOCK, pigpio.FALLING_EDGE, self._callback)
 
       self.set_mode(mode)
 
