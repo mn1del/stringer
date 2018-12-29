@@ -89,14 +89,14 @@ if __name__ == "__main__":
 
       s.start()
 
-#      c, mode, reading = s.get_reading()
+      c, mode, reading = s.get_reading()
 #      while True:
 #         count, mode, reading = s.get_reading()
 #
 #         if count != c:
 #            c = count 
-#            s.calibrate(known_weight_grams, reading)
-#            print("Calibration slope: {}, Offset: {}".format(s.slope, s.offset))
+      s.calibrate(known_weight_grams, reading)
+      print("Calibration slope: {}, Offset: {}".format(s.slope, s.offset))
 #            break
 #
 #         time.sleep(0.05)
