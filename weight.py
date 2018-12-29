@@ -120,7 +120,7 @@ if __name__ == "__main__":
       while True:
           timestamp = time.time()
           c,m,r = s.get_reading()
-          print("{}s: {}".format(time.time()-timestamp(), r))
+          print("{}s: {}".format(time.time()-timestamp, r))
           time.sleep(0.1)
           #pass
 
