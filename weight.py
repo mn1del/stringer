@@ -30,7 +30,7 @@ if __name__ == "__main__":
    if not pi.connected:
       exit(0)
 
-   s = HX(pi, DATA=5, CLOCK=6, mode=HX711.CH_A_GAIN_128, callback=cbf)
+   s = HX(pi, DATA=5, CLOCK=6, mode=HX711.CH_A_GAIN_128, callback=None)
    #s = HX711.sensor(
    #   pi, DATA=5, CLOCK=6, mode=HX711.CH_B_GAIN_32, callback=cbf)
 
