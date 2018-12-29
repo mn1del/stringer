@@ -28,21 +28,22 @@ if __name__ == "__main__":
    if not pi.connected:
       exit(0)
 
-   s = HX(pi, DATA=5, CLOCK=6, mode=HX711.CH_A_GAIN_128, callback=cbf)
 
    try:
-      print("Initialized...")
-      timestamp = time.time()
-      reading = 1
-      while True:
-          c,m,r = s.get_reading()
-          if r != reading:
-              newtime = time.time()
-              reading = r
-              print("{}s: reading: {}".format(
-                  round(newtime-timestamp, 3), reading))
-              timestamp = newtime
-          time.sleep(0.05)    
+      s = HX(pi, DATA=5, CLOCK=6, mode=HX711.CH_A_GAIN_128, callback=cbf)
+#      print("Initialized...")
+#      timestamp = time.time()
+#      reading = 1
+#      while True:
+#          pass
+#          c,m,r = s.get_reading()
+#          if r != reading:
+#              newtime = time.time()
+#              reading = r
+#              print("{}s: reading: {}".format(
+#                  round(newtime-timestamp, 3), reading))
+#              timestamp = newtime
+#          time.sleep(0.05)    
 
    except KeyboardInterrupt:
       pass
