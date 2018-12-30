@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
 
    try:
-      s = HX(pi, DATA=5, CLOCK=6, mode=HX711.CH_A_GAIN_128, callback=cbf)
+      s = HX(pi, DATA=22, CLOCK=17, mode=HX711.CH_A_GAIN_128, callback=cbf)
 #      print("Initialized...")
 #      timestamp = time.time()
 #      reading = 1
