@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join("..", "rpigpio")))
 from hx711 import HX711
 from lcd1602 import LCD1602
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 
 
 if __name__ == "__main__":
@@ -24,4 +24,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         pass
     finally:
-        GPIO.cleanup()
+        #GPIO.cleanup()
+        pass
