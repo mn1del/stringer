@@ -4,7 +4,7 @@
 import sys
 import os
 
-sys.path.append(os.path.abspath(r"..\rpigpio"))
+sys.path.append(os.path.abspath(os.path.join("..", "rpigpio")))
 from hx711 import HX711
 from lcd1602 import LCD1602
 
