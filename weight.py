@@ -19,4 +19,5 @@ if __name__ == "__main__":
             lcd.lcd_string(hx.AVG_READING, lcd.LCD_LINE_2)
     except KeyboardInterrupt:
         pass
-    finally GPIO.cleanup()
+    finally:
+        GPIO.cleanup()
