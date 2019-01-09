@@ -15,14 +15,21 @@ if __name__ == "__main__":
     try:
         n_obs = 5
         hx = HX711(printout=False)
-        #hx.start_monitoring(n_obs=n_obs)
         lcd = LCD1602()
+        rot = RotaryEncoder()
+        counter = rot.COUNTER
+        button = rot.BUTTON_LAST_PRESS
         while True:
-            #print("Reading (avg of {}): {}".format(n_obs, hx.AVG_READING))
             reading = hx.get_reading(5)
-            lcd.lcd_string("Reading:", lcd.LCD_LINE_1)
-            lcd.lcd_string("{:,.3f}".format(reading), lcd.LCD_LINE_2)
-            #time.sleep(0.01)
+            if not rot.BUTTON_LONG_PRESS:
+                lcd.lcd_string("Reading:", lcd.LCD_LINE_1)
+                lcd.lcd_string("{:,.3f}".format(reading), lcd.LCD_LINE_2)
+            if (rot.BUTTON_LAST_PRESS != button) & (rot.BUTTON_LONG_PRESS):
+                button = rot.BUTTON_LAST_PRESS
+                lcd.cleanup()
+                lcd.lcd_string("Long press:", lcd.LCD_LINE_1)
+
+
     except KeyboardInterrupt:
         pass
     finally:
