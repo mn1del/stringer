@@ -14,13 +14,14 @@ if __name__ == "__main__":
     try:
         n_obs = 5
         hx = HX711(printout=False)
-        hx.start_monitoring(n_obs=n_obs)
+        #hx.start_monitoring(n_obs=n_obs)
         lcd = LCD1602()
         while True:
-            print("Reading (avg of {}): {}".format(n_obs, hx.AVG_READING))
+            #print("Reading (avg of {}): {}".format(n_obs, hx.AVG_READING))
+            reading = hx.get_reading(5)
             lcd.lcd_string("Reading:", lcd.LCD_LINE_1)
-            lcd.lcd_string(hx.AVG_READING, lcd.LCD_LINE_2)
-            time.sleep(0.1)
+            lcd.lcd_string(reading, lcd.LCD_LINE_2)
+            time.sleep(0.01)
     except KeyboardInterrupt:
         pass
     finally:
