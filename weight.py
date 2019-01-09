@@ -8,7 +8,7 @@ import time
 sys.path.append(os.path.abspath(os.path.join("..", "rpigpio")))
 from hx711 import HX711
 from lcd1602 import LCD1602
-#import RPi.GPIO as GPIO
+from rotaryencoder import RotaryEncoder
 
 
 if __name__ == "__main__":
