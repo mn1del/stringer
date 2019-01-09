@@ -26,7 +26,7 @@ if __name__ == "__main__":
                 lcd.lcd_string("{:,.3f}".format(reading), lcd.LCD_LINE_2)
             if (rot.BUTTON_LAST_PRESS != button) & (rot.BUTTON_LONG_PRESS):
                 button = rot.BUTTON_LAST_PRESS
-                lcd.cleanup()
+                lcd.clear_screen()
                 lcd.lcd_string("Long press:", lcd.LCD_LINE_1)
 
 
