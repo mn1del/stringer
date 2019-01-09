@@ -20,7 +20,7 @@ if __name__ == "__main__":
             #print("Reading (avg of {}): {}".format(n_obs, hx.AVG_READING))
             reading = hx.get_reading(5)
             lcd.lcd_string("Reading:", lcd.LCD_LINE_1)
-            lcd.lcd_string(reading, lcd.LCD_LINE_2)
+            lcd.lcd_string("{:,.3f}".format(reading), lcd.LCD_LINE_2)
             time.sleep(0.01)
     except KeyboardInterrupt:
         pass
