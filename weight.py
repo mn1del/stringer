@@ -3,6 +3,7 @@
 
 import sys
 import os
+import time
 
 sys.path.append(os.path.abspath(os.path.join("..", "rpigpio")))
 from hx711 import HX711
@@ -21,7 +22,7 @@ if __name__ == "__main__":
             reading = hx.get_reading(5)
             lcd.lcd_string("Reading:", lcd.LCD_LINE_1)
             lcd.lcd_string("{:,.3f}".format(reading), lcd.LCD_LINE_2)
-            time.sleep(0.01)
+            #time.sleep(0.01)
     except KeyboardInterrupt:
         pass
     finally:
