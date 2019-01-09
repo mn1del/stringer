@@ -11,12 +11,15 @@ from lcd1602 import LCD1602
 
 if __name__ == "__main__":
     try:
-        hx = HX711(printout=True)
-        hx.start_monitoring(n_obs=5)
+        n_obs = 5
+        hx = HX711(printout=False)
+        hx.start_monitoring(n_obs=n_obs)
         lcd = LCD1602()
         while True:
+            print("Reading (avg of {}): {}".format(n_obs, hx.AVG_READING))
             lcd.lcd_string("Reading:", lcd.LCD_LINE_1)
             lcd.lcd_string(hx.AVG_READING, lcd.LCD_LINE_2)
+            time.sleep(0.1)
     except KeyboardInterrupt:
         pass
     finally:
