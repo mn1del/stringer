@@ -17,17 +17,44 @@ if __name__ == "__main__":
         hx = HX711(printout=False)
         lcd = LCD1602()
         rot = RotaryEncoder()
-        counter = rot.COUNTER
         button = rot.BUTTON_LAST_PRESS
+        calibrating = False
+        kgs_mode = True
+        kgs = 0
+        grams = 0
+        factor = 1
+        offset = 0
         while True:
-            reading = hx.get_reading(5)
-            if not rot.BUTTON_LONG_PRESS:
-                lcd.lcd_string("Reading:", lcd.LCD_LINE_1)
-                lcd.lcd_string("{:,.3f}".format(reading), lcd.LCD_LINE_2)
-            if (rot.BUTTON_LAST_PRESS != button) & (rot.BUTTON_LONG_PRESS):
-                button = rot.BUTTON_LAST_PRESS
-                lcd.clear_screen()
-                lcd.lcd_string("Long press:", lcd.LCD_LINE_1)
+            if not calibrating:
+                reading = hx.get_reading(5)
+                if rot.BUTTON_LONG_PRESS:
+                    rot.BUTTON_LONG_PRESS = False
+                    calibrating = True
+                    kgs_mode = True
+                    lcd.clear_screen()
+                    lcd.lcd_string("Enter weight:", lcd.LCD_LINE_1)
+                    button = rot.BUTTON_LAST_PRESS
+                else:    
+                    lcd.lcd_string("Reading:", lcd.LCD_LINE_1)
+                    lcd.lcd_string("{:,.3f}".format(reading), lcd.LCD_LINE_2)
+            else:        
+                while not rot.BUTTON_LONG_PRESS:
+                    if rot.BUTTON_LAST_PRESS != button:
+                        button = rot.BUTTON_LAST_PRESS
+                        kgs_mode = not kgs_mode
+                        if kgs_mode:
+                            rot.COUNTER = kgs
+                        else:
+                            rot.COUNTER = grams
+                    if kgs_mode:
+                        kgs = max(0, min(rot.COUNTER))
+                    else:
+                        grams = max(0, min(99,rot.COUNTER))
+                    lcd.lcd_string("{}.{}".format(kgs, grams), lcd.LCD_LINE_2)
+                lcd.lcd_string("*"*16, lcd.LCD_LINE_1)
+                lcd.lcd_string("*"*16, lcd.LCD_LINE_2)
+                calibrating = False    
+                reading = hx.get_reading(30)
 
 
     except KeyboardInterrupt:
