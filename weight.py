@@ -53,6 +53,7 @@ if __name__ == "__main__":
                     else:
                         grams = max(0, min(99,rot.COUNTER))
                     lcd.lcd_string("{}.{}".format(kgs, grams), lcd.LCD_LINE_2)
+                rot.BUTTON_LONG_PRESS
                 lcd.lcd_string("*"*16, lcd.LCD_LINE_1)
                 lcd.lcd_string("*"*16, lcd.LCD_LINE_2)
                 calibrating = False    
