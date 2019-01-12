@@ -49,7 +49,7 @@ if __name__ == "__main__":
                         else:
                             rot.COUNTER = grams
                     if kgs_mode:
-                        kgs = max(0, min(rot.COUNTER))
+                        kgs = max(0, min(99, rot.COUNTER))
                     else:
                         grams = max(0, min(99,rot.COUNTER))
                     lcd.lcd_string("{}.{}".format(kgs, grams), lcd.LCD_LINE_2)
