@@ -4,6 +4,7 @@
 import sys
 import os
 import time
+import RPi.GPIO as GPIO
 
 sys.path.append(os.path.abspath(os.path.join("..", "rpigpio")))
 from hx711 import HX711
@@ -13,6 +14,7 @@ from rotaryencoder import RotaryEncoder
 
 if __name__ == "__main__":
     try:
+        GPIO.setmode(GPIO.BCM)
         n_obs = 5
         hx = HX711(printout=False)
         lcd = LCD1602()
