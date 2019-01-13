@@ -20,7 +20,7 @@ if __name__ == "__main__":
     try:
         GPIO.setmode(GPIO.BCM)
         n_obs = 5
-        hx = HX711(data=2, clock=3, channel="A", gain=128, printout=True)
+        hx = HX711(data=2, clock=3, channel="A", gain=128, printout=False)
         lcd = LCD1602(data_pins=[23,24,25,8], rs_pin=14, e_pin=15)
         rot = RotaryEncoder(clk=22, dt=27, button=17, counter=0, long_press_secs=1.0, debounce_n=2)
         button = rot.BUTTON_LAST_PRESS
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         cal_offset = 135222.4
         while True:
             if not calibrating:
-                reading = hx.get_reading(5)
+                reading = hx.get_reading(n_obs=5, clip=True)
                 converted_reading = max(
                         0,round((reading - cal_offset) / cal_factor,2))
                 if rot.BUTTON_LONG_PRESS:
@@ -70,7 +70,7 @@ if __name__ == "__main__":
                         lcd.lcd_string("{} kgs".format(known_weight), lcd.LCD_LINE_2)
                     rot.BUTTON_LONG_PRESS = False
                     calibrating = False    
-                    cal_readings.append([known_weight, hx.get_reading(30)])
+                    cal_readings.append([known_weight, hx.get_reading(n_obs=9, clip=True)])
                 # now that we have two calibration readings:
                 cal_factor = (cal_readings[1][1] - cal_readings[0][1]) \
                         / (cal_readings[1][0] - cal_readings[0][0])
