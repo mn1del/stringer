@@ -66,14 +66,15 @@ if __name__ == "__main__":
                         known_weight = float("{}.{}".format(kgs, grams))    
                         lcd.lcd_string("{} kgs".format(known_weight), lcd.LCD_LINE_2)
                     rot.BUTTON_LONG_PRESS = False
-                    lcd.lcd_string("*"*16, lcd.LCD_LINE_1)
-                    lcd.lcd_string("*"*16, lcd.LCD_LINE_2)
                     calibrating = False    
                     cal_readings.append([known_weight, hx.get_reading(30)])
                 # now that we have two calibration readings:
                 cal_factor = (cal_readings[1][1] - cal_readings[0][1]) \
                         / (cal_readings[1][0] - cal_readings[0][0])
                 cal_offset = cal_readings[1][1] - cal_factor * cal_readings[1][0]
+                lcd.lcd_string("*"*16, lcd.LCD_LINE_1)
+                lcd.lcd_string("*"*16, lcd.LCD_LINE_2)
+                print("readings: {}\n\nfactor: {}\noffset: {}".format(cal_readings, cal_factor, cal_offset))
 
 
     except KeyboardInterrupt:
