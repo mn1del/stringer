@@ -22,8 +22,8 @@ if __name__ == "__main__":
         button = rot.BUTTON_LAST_PRESS
         # default calibration settings
         calibrating = False
-        cal_factor = 1.0 
-        cal_offset = 0.0
+        cal_factor = 91038.5
+        cal_offset = 135222.4
         while True:
             if not calibrating:
                 reading = hx.get_reading(5)
