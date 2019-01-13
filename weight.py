@@ -33,6 +33,7 @@ if __name__ == "__main__":
                     rot.BUTTON_LONG_PRESS = False
                     calibrating = True
                     kgs_mode = True
+                    rot.COUNTER = 0
                     kgs = 0
                     grams = 0
                     lcd.clear_screen()
