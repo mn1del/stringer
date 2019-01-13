@@ -6,7 +6,8 @@ import os
 import time
 import RPi.GPIO as GPIO
 
-sys.path.append(os.path.abspath(os.path.join("..", "rpigpio")))
+#sys.path.append(os.path.abspath(os.path.join("..", "rpigpio")))
+sys.path.append(os.path.abspath(os.path.join("..")))
 #from hx711 import HX711
 #from lcd1602 import LCD1602
 #from rotaryencoder import RotaryEncoder
