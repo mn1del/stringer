@@ -51,8 +51,8 @@ if __name__ == "__main__":
                     if kgs_mode:
                         kgs = max(0, min(99, rot.COUNTER))
                     else:
-                        grams = max(0, min(99,rot.COUNTER))
-                    lcd.lcd_string("{}.{}".format(kgs, grams), lcd.LCD_LINE_2)
+                        grams = max(0, min(9,rot.COUNTER))
+                    lcd.lcd_string("{}.{} kgs".format(kgs, grams), lcd.LCD_LINE_2)
                 rot.BUTTON_LONG_PRESS == False
                 lcd.lcd_string("*"*16, lcd.LCD_LINE_1)
                 lcd.lcd_string("*"*16, lcd.LCD_LINE_2)
