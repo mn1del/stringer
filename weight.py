@@ -21,9 +21,9 @@ if __name__ == "__main__":
         rot = RotaryEncoder()
         button = rot.BUTTON_LAST_PRESS
         calibrating = False
-        kgs_mode = True
-        kgs = 0
-        grams = 0
+        #kgs_mode = True
+        #kgs = 0
+        #grams = 0
         factor = 1
         offset = 0
         while True:
@@ -33,6 +33,8 @@ if __name__ == "__main__":
                     rot.BUTTON_LONG_PRESS = False
                     calibrating = True
                     kgs_mode = True
+                    kgs = 0
+                    grams = 0
                     lcd.clear_screen()
                     lcd.lcd_string("Enter weight:", lcd.LCD_LINE_1)
                     button = rot.BUTTON_LAST_PRESS
