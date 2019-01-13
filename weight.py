@@ -27,7 +27,8 @@ if __name__ == "__main__":
         while True:
             if not calibrating:
                 reading = hx.get_reading(5)
-                converted_reading = round((reading - cal_offset) / cal_factor,2)
+                converted_reading = min(
+                        0,round((reading - cal_offset) / cal_factor,2))
                 if rot.BUTTON_LONG_PRESS:
                     rot.BUTTON_LONG_PRESS = False
                     calibrating = True
