@@ -7,18 +7,21 @@ import time
 import RPi.GPIO as GPIO
 
 sys.path.append(os.path.abspath(os.path.join("..", "rpigpio")))
-from hx711 import HX711
-from lcd1602 import LCD1602
-from rotaryencoder import RotaryEncoder
+#from hx711 import HX711
+#from lcd1602 import LCD1602
+#from rotaryencoder import RotaryEncoder
+from rpigpio import HX711
+from rpigpio import LCD1602
+from rpigpio import RotaryEncoder
 
 
 if __name__ == "__main__":
     try:
         GPIO.setmode(GPIO.BCM)
         n_obs = 5
-        hx = HX711(printout=False)
-        lcd = LCD1602()
-        rot = RotaryEncoder()
+        hx = HX711(data=2, clock=3, channel="A", gain=128, printout=True)
+        lcd = LCD1602(data_pins=[23,24,25,8], rs_pin=14, e_pin=15)
+        rot = RotaryEncoder(clk=22, dt=27, button=17, counter=0, long_press_secs=1.0, debounce_n=2)
         button = rot.BUTTON_LAST_PRESS
         # default calibration settings
         calibrating = False
