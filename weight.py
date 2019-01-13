@@ -20,16 +20,14 @@ if __name__ == "__main__":
         lcd = LCD1602()
         rot = RotaryEncoder()
         button = rot.BUTTON_LAST_PRESS
+        # default calibration settings
         calibrating = False
-        #kgs_mode = True
-        #kgs = 0
-        #grams = 0
         cal_factor = 1.0 
         cal_offset = 0.0
         while True:
             if not calibrating:
                 reading = hx.get_reading(5)
-                converted_reading = (reading - cal_offset) / cal_factor
+                converted_reading = round((reading - cal_offset) / cal_factor,2)
                 if rot.BUTTON_LONG_PRESS:
                     rot.BUTTON_LONG_PRESS = False
                     calibrating = True
@@ -42,7 +40,7 @@ if __name__ == "__main__":
                     button = rot.BUTTON_LAST_PRESS
                 else:    
                     lcd.lcd_string("Reading:", lcd.LCD_LINE_1)
-                    lcd.lcd_string("{:,.3f}".format(converted_reading), lcd.LCD_LINE_2)
+                    lcd.lcd_string("{:,.1f} kgs".format(converted_reading), lcd.LCD_LINE_2)
             else:        
                 while len(cal_readings) < 2:
                     if len(cal_readings) == 0:
@@ -59,10 +57,10 @@ if __name__ == "__main__":
                                 rot.COUNTER = grams
                         if kgs_mode:
                             rot.COUNTER = max(0, min(99, rot.COUNTER))
-                            kgs = rot.COUNTER # max(0, min(99, rot.COUNTER))
+                            kgs = rot.COUNTER
                         else:
                             rot.COUNTER = max(0, min(9,rot.COUNTER))
-                            grams = rot.COUNTER # max(0, min(9,rot.COUNTER))
+                            grams = rot.COUNTER
                         known_weight = float("{}.{}".format(kgs, grams))    
                         lcd.lcd_string("{} kgs".format(known_weight), lcd.LCD_LINE_2)
                     rot.BUTTON_LONG_PRESS = False
@@ -74,7 +72,8 @@ if __name__ == "__main__":
                 cal_offset = cal_readings[1][1] - cal_factor * cal_readings[1][0]
                 lcd.lcd_string("*"*16, lcd.LCD_LINE_1)
                 lcd.lcd_string("*"*16, lcd.LCD_LINE_2)
-                print("readings: {}\n\nfactor: {}\noffset: {}".format(cal_readings, cal_factor, cal_offset))
+                print("Calibration factor: {}\nCalibration offset: {}"
+                        .format(cal_factor, cal_offset))
 
 
     except KeyboardInterrupt:
