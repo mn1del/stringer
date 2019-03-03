@@ -16,9 +16,11 @@ if __name__ == "__main__":
     try:
         GPIO.setmode(GPIO.BCM)
         n_obs = 5
+        target_kgs = 23.0
         hx = HX711(data=2, clock=3, channel="A", gain=128, printout=False)
         lcd = LCD1602(data_pins=[23,24,25,8], rs_pin=14, e_pin=15)
-        rot = RotaryEncoder(clk=22, dt=27, button=17, counter=0, long_press_secs=1.0, debounce_n=2)
+        rot = RotaryEncoder(clk=22, dt=27, button=17,
+                counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
         button = rot.BUTTON_LAST_PRESS
         # default calibration settings
         calibrating = False
@@ -29,6 +31,7 @@ if __name__ == "__main__":
                 reading = hx.get_reading(n_obs=5, clip=True)
                 converted_reading = max(
                         0,round((reading - cal_offset) / cal_factor,2))
+                target_kgs = max(0, min(500, rot_COUNTER))/10
                 if rot.BUTTON_LONG_PRESS:
                     rot.BUTTON_LONG_PRESS = False
                     calibrating = True
@@ -40,8 +43,8 @@ if __name__ == "__main__":
                     lcd.clear_screen()
                     button = rot.BUTTON_LAST_PRESS
                 else:    
-                    lcd.lcd_string("Reading:", lcd.LCD_LINE_1)
-                    lcd.lcd_string("{:,.1f} kgs".format(converted_reading), lcd.LCD_LINE_2)
+                    lcd.lcd_string("{:,.1f} kg".format(converted_reading), lcd.LCD_LINE_1)
+                    lcd.lcd_string("Target: {:,.1f} kg".format(target_kgs), lcd.LCD_LINE_2)
             else:        
                 while len(cal_readings) < 2:
                     if len(cal_readings) == 0:
