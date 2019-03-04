@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath(os.path.join("..")))
 from rpigpio import HX711
 from rpigpio import LCD1602
 from rpigpio import RotaryEncoder
+from rpigpio import Toggle
 
 
 if __name__ == "__main__":
@@ -22,6 +23,7 @@ if __name__ == "__main__":
         rot = RotaryEncoder(clk=22, dt=27, button=17,
                 counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
         button = rot.BUTTON_LAST_PRESS
+        tension_toggle = Toggle(toggle_pin=4)
         # default calibration settings
         calibrating = False
         cal_factor = 91038.5
@@ -32,6 +34,7 @@ if __name__ == "__main__":
                 converted_reading = max(
                         0,round((reading - cal_offset) / cal_factor,2))
                 target_kgs = max(0, min(500, rot_COUNTER))/10
+                # long press triggers a switch to calibration mode
                 if rot.BUTTON_LONG_PRESS:
                     rot.BUTTON_LONG_PRESS = False
                     calibrating = True
@@ -45,6 +48,13 @@ if __name__ == "__main__":
                 else:    
                     lcd.lcd_string("{:,.1f} kg".format(converted_reading), lcd.LCD_LINE_1)
                     lcd.lcd_string("Target: {:,.1f} kg".format(target_kgs), lcd.LCD_LINE_2)
+                    # logic to drive the stepper
+                    if tension_toggle.is_on:
+                        if converted_reading < target_kgs:
+                            # increment stepper
+                    else:
+                        # decrement stepper
+
             else:        
                 while len(cal_readings) < 2:
                     if len(cal_readings) == 0:
@@ -76,6 +86,7 @@ if __name__ == "__main__":
                 cal_offset = cal_readings[1][1] - cal_factor * cal_readings[1][0]
                 lcd.lcd_string("*"*16, lcd.LCD_LINE_1)
                 lcd.lcd_string("*"*16, lcd.LCD_LINE_2)
+                rot.COUNTER = target_kgs*10
                 print("Calibration factor: {}\nCalibration offset: {}"
                         .format(cal_factor, cal_offset))
 
