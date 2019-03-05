@@ -11,6 +11,7 @@ from rpigpio import HX711
 from rpigpio import LCD1602
 from rpigpio import RotaryEncoder
 from rpigpio import Toggle
+from rpigpio import Button
 
 
 if __name__ == "__main__":
@@ -24,18 +25,24 @@ if __name__ == "__main__":
                 counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
         button = rot.BUTTON_LAST_PRESS
         tension_toggle = Toggle(toggle_pin=4)
+        limit_switch = Button(button_pin=10)
         # default calibration settings
         calibrating = False
         cal_factor = 91038.5
         cal_offset = 135222.4
         while True:
             if not calibrating:
+                """
+                Get reading in kgs, and target kgs
+                """
                 reading = hx.get_reading(n_obs=5, clip=True)
                 converted_reading = max(
                         0,round((reading - cal_offset) / cal_factor,2))
                 target_kgs = max(0, min(500, rot_COUNTER))/10
-                # long press triggers a switch to calibration mode
                 if rot.BUTTON_LONG_PRESS:
+                    """
+                    Switch to calibration mode
+                    """
                     rot.BUTTON_LONG_PRESS = False
                     calibrating = True
                     cal_readings = []  # to be populated with len==2 list of [known_weight, raw_reading] 
@@ -46,14 +53,31 @@ if __name__ == "__main__":
                     lcd.clear_screen()
                     button = rot.BUTTON_LAST_PRESS
                 else:    
+                    """
+                    Print reading and target
+                    """
                     lcd.lcd_string("{:,.1f} kg".format(converted_reading), lcd.LCD_LINE_1)
                     lcd.lcd_string("Target: {:,.1f} kg".format(target_kgs), lcd.LCD_LINE_2)
                     # logic to drive the stepper
                     if tension_toggle.is_on:
+                        """
+                        Trigger tensioning logic
+                        """
                         if converted_reading < target_kgs:
-                            # increment stepper
+                            # tighten stepper
+                        else:
+                            if not limit_switch.is_on(debounce_pause=0.04):
+                                # loosen stepper
+                            else:
+                                """
+                                Something is wrong. There is tension, but the tensioner
+                                is up against the limit switch
+                                """
+                                lcd.lcd_string("*** ERROR ***", lcd.LCD_LINE_1)
+                                lcd.lcd_string("LIMIT SWITCH ON", lcd.LCD_LINE_2)
                     else:
-                        # decrement stepper
+                        if not limit_switch.is_on(debounce_pause=0.04):
+                            # loosen stepper unless already up against the limit switch
 
             else:        
                 while len(cal_readings) < 2:
