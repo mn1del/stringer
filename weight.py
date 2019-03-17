@@ -24,7 +24,7 @@ if __name__ == "__main__":
         rot = RotaryEncoder(clk=22, dt=27, button=17,
                 counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
         button = rot.BUTTON_LAST_PRESS
-        tension_toggle = Toggle(toggle_pin=4)
+        tension_toggle = Toggle(toggle_pin=4, debounce_delay_secs=0.05)
         limit_switch = Button(button_pin=10)
         # default calibration settings
         calibrating = False
