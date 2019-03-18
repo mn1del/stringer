@@ -19,9 +19,9 @@ if __name__ == "__main__":
         GPIO.setmode(GPIO.BCM)
         n_obs = 5
         target_kgs = 23.0
-        hx = HX711(data=2, clock=3, channel="A", gain=128, printout=False)
-        lcd = LCD1602(data_pins=[23,24,25,8], rs_pin=14, e_pin=15)
-        rot = RotaryEncoder(clk=22, dt=27, button=17,
+        hx = HX711(data=11, clock=9, channel="A", gain=128, printout=False)
+        lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=23, e_pin=24)
+        rot = RotaryEncoder(clk=7, dt=8, button=25,
                 counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
         button = rot.BUTTON_LAST_PRESS
         tension_toggle = Toggle(toggle_pin=4, debounce_delay_secs=0.05)
