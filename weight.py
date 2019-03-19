@@ -13,6 +13,8 @@ from rpigpio import RotaryEncoder
 from rpigpio import Toggle
 from rpigpio import Button
 
+import config  # where calibration settings etc are stored
+
 
 if __name__ == "__main__":
     try:
@@ -28,8 +30,8 @@ if __name__ == "__main__":
         limit_switch = Button(button_pin=10)
         # default calibration settings
         calibrating = False
-        cal_factor = 91038.5
-        cal_offset = 135222.4
+        cal_factor = config.cal_factor
+        cal_offset = config.cal_offset
         while True:
             if not calibrating:
                 """
@@ -79,7 +81,7 @@ if __name__ == "__main__":
                         if not limit_switch.is_on(debounce_pause=0.04):
                             # loosen stepper unless already up against the limit switch
 
-            else:        
+            else:  # calibrating        
                 while len(cal_readings) < 2:
                     if len(cal_readings) == 0:
                         lcd.lcd_string("Enter weight 1:", lcd.LCD_LINE_1)
@@ -104,10 +106,16 @@ if __name__ == "__main__":
                     rot.BUTTON_LONG_PRESS = False
                     calibrating = False    
                     cal_readings.append([known_weight, hx.get_reading(n_obs=9, clip=True)])
+
                 # now that we have two calibration readings:
                 cal_factor = (cal_readings[1][1] - cal_readings[0][1]) \
                         / (cal_readings[1][0] - cal_readings[0][0])
                 cal_offset = cal_readings[1][1] - cal_factor * cal_readings[1][0]
+
+                # store new calibration variables in config.py
+                with open("config.py", "w") as f:
+                    f.write("cal_factor={}\ncal_offset={}".format(cal_factor, cal_offset))
+
                 lcd.lcd_string("*"*16, lcd.LCD_LINE_1)
                 lcd.lcd_string("*"*16, lcd.LCD_LINE_2)
                 rot.COUNTER = target_kgs*10
