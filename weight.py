@@ -21,6 +21,8 @@ if __name__ == "__main__":
         GPIO.setmode(GPIO.BCM)
         n_obs = 5
         target_kgs = 23.0
+        movement_mm = 0.5  # distance to increment the leadscrew
+        leadscrew_lead = 2
         hx = HX711(data=11, clock=9, channel="A", gain=128, printout=False)
         lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=23, e_pin=24)
         rot = RotaryEncoder(clk=7, dt=8, button=25,
@@ -28,6 +30,14 @@ if __name__ == "__main__":
         button = rot.BUTTON_LAST_PRESS
         tension_toggle = Toggle(toggle_pin=4, debounce_delay_secs=0.05)
         limit_switch = Button(button_pin=10)
+        stepper = Stepper(
+                dir_pin=27, 
+                step_pin=22, 
+                ms1_pin=21, 
+                ms2_pin=20, 
+                ms3_pin=16,
+                steps_per_rev=200,
+                microstep_mode=2)
         # default calibration settings
         calibrating = False
         cal_factor = config.cal_factor
@@ -67,9 +77,15 @@ if __name__ == "__main__":
                         """
                         if converted_reading < target_kgs:
                             # tighten stepper
+                            direction = 1
+                            n_steps = steps_per_rev * movement_mm / leadscrew_lead 
+                            stepper.step(n_steps=n_steps, direction=direction)
                         else:
                             if not limit_switch.is_on(debounce_pause=0.04):
                                 # loosen stepper
+                                direction = 0
+                                n_steps = steps_per_rev * movement_mm / leadscrew_lead 
+                                stepper.step(n_steps=n_steps, direction=direction)
                             else:
                                 """
                                 Something is wrong. There is tension, but the tensioner
@@ -80,6 +96,9 @@ if __name__ == "__main__":
                     else:
                         if not limit_switch.is_on(debounce_pause=0.04):
                             # loosen stepper unless already up against the limit switch
+                            direction = 0
+                            n_steps = steps_per_rev * 5 / leadscrew_lead 
+                            stepper.step(n_steps=n_steps, direction=direction)
 
             else:  # calibrating        
                 while len(cal_readings) < 2:
