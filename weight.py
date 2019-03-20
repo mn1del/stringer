@@ -21,7 +21,7 @@ if __name__ == "__main__":
         GPIO.setmode(GPIO.BCM)
         n_obs = 5
         target_kgs = 23.0
-        movement_mm = 0.5  # distance to increment the leadscrew
+        movement_mm = 0.25  # distance to increment the leadscrew
         leadscrew_lead = 2
         hx = HX711(data=11, clock=9, channel="A", gain=128, printout=False)
         lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=23, e_pin=24)
@@ -29,7 +29,7 @@ if __name__ == "__main__":
                 counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
         button = rot.BUTTON_LAST_PRESS
         tension_toggle = Toggle(toggle_pin=4, debounce_delay_secs=0.05)
-        limit_switch = Button(button_pin=10)
+        limit_switch = Button(button_pin=10, pull_up=True, debounce_delay_secs=0.01)
         stepper = Stepper(
                 dir_pin=27, 
                 step_pin=22, 
@@ -66,7 +66,7 @@ if __name__ == "__main__":
                     button = rot.BUTTON_LAST_PRESS
                 else:    
                     """
-                    Print reading and target
+                    Print reading and target. Control stepper.
                     """
                     lcd.lcd_string("{:,.1f} kg".format(converted_reading), lcd.LCD_LINE_1)
                     lcd.lcd_string("Target: {:,.1f} kg".format(target_kgs), lcd.LCD_LINE_2)
@@ -76,12 +76,19 @@ if __name__ == "__main__":
                         Trigger tensioning logic
                         """
                         if converted_reading < target_kgs:
-                            # tighten stepper
-                            direction = 1
-                            n_steps = steps_per_rev * movement_mm / leadscrew_lead 
-                            stepper.step(n_steps=n_steps, direction=direction)
-                        else:
-                            if not limit_switch.is_on(debounce_pause=0.04):
+                            if limit_switch.STATE:  # safe to proceed
+                                # tighten stepper
+                                direction = 1
+                                n_steps = steps_per_rev * movement_mm / leadscrew_lead 
+                                stepper.step(n_steps=n_steps, direction=direction)
+                            else:
+                                # limit switch hit whilst tightening **assumption!!**
+                                # therefore back off the limit switch by 10mm
+                                direction = 0
+                                n_steps = steps_per_rev * 10 / leadscrew_lead 
+                                stepper.step(n_steps=n_steps, direction=direction)
+                        else:  # still in tensioning mode, but actual tension has overshot target tension
+                            if limit_switch.STATE:  # safe to proceed
                                 # loosen stepper
                                 direction = 0
                                 n_steps = steps_per_rev * movement_mm / leadscrew_lead 
@@ -93,13 +100,16 @@ if __name__ == "__main__":
                                 """
                                 lcd.lcd_string("*** ERROR ***", lcd.LCD_LINE_1)
                                 lcd.lcd_string("LIMIT SWITCH ON", lcd.LCD_LINE_2)
-                    else:
-                        if not limit_switch.is_on(debounce_pause=0.04):
-                            # loosen stepper unless already up against the limit switch
+                    else:  # release all tension
+                        while limit_switch.STATE:
+                            # loosen stepper until the limit switch is hit
                             direction = 0
-                            n_steps = steps_per_rev * 5 / leadscrew_lead 
+                            n_steps = steps_per_rev * movement_mm / leadscrew_lead 
                             stepper.step(n_steps=n_steps, direction=direction)
-
+                        # back off the limit switch by 10mm    
+                        direction = 1
+                        n_steps = steps_per_rev * 10 / leadscrew_lead 
+                        stepper.step(n_steps=n_steps, direction=direction) 
             else:  # calibrating        
                 while len(cal_readings) < 2:
                     if len(cal_readings) == 0:
