@@ -12,6 +12,7 @@ from rpigpio import LCD1602
 from rpigpio import RotaryEncoder
 from rpigpio import Toggle
 from rpigpio import Button
+from rpigpio import Stepper
 
 import config  # where calibration settings etc are stored
 
