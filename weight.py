@@ -37,7 +37,8 @@ if __name__ == "__main__":
                 ms2_pin=20, 
                 ms3_pin=16,
                 steps_per_rev=200,
-                microstep_mode=2)
+                microstep_mode=2,
+                driver="drv8825")
         # default calibration settings
         calibrating = False
         cal_factor = config.cal_factor
