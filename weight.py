@@ -29,7 +29,7 @@ if __name__ == "__main__":
         rot = RotaryEncoder(clk=7, dt=8, button=25,
                 counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
         button = rot.BUTTON_LAST_PRESS
-        tension_toggle = Toggle(toggle_pin=18, debounce_delay_secs=0.01)
+        tension_toggle = Toggle(toggle_pin=12, debounce_delay_secs=0.01)
         limit_switch = Button(button_pin=15, pull_up=True, debounce_delay_secs=0.01)
         stepper = Stepper(
                 dir_pin=8, 
