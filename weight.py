@@ -24,7 +24,7 @@ if __name__ == "__main__":
         target_kgs = 23.0
         movement_mm = 0.25  # distance to increment the leadscrew
         leadscrew_lead = 2
-        hx = HX711(data=11, clock=9, channel="A", gain=128, printout=False)
+        hx = HX711(data=3, clock=2, channel="A", gain=128, printout=False)
         lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=23, e_pin=24)
         rot = RotaryEncoder(clk=7, dt=8, button=25,
                 counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
