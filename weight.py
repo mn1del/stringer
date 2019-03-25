@@ -25,15 +25,15 @@ if __name__ == "__main__":
         movement_mm = 0.25  # distance to increment the leadscrew
         leadscrew_lead = 2
         hx = HX711(data=3, clock=2, channel="A", gain=128, printout=False)
-        lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=23, e_pin=24)
+        lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=11, e_pin=5)
         rot = RotaryEncoder(clk=7, dt=8, button=25,
                 counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
         button = rot.BUTTON_LAST_PRESS
         tension_toggle = Toggle(toggle_pin=18, debounce_delay_secs=0.01)
         limit_switch = Button(button_pin=15, pull_up=True, debounce_delay_secs=0.01)
         stepper = Stepper(
-                dir_pin=27, 
-                step_pin=22, 
+                dir_pin=8, 
+                step_pin=7, 
                 ms1_pin=21, 
                 ms2_pin=20, 
                 ms3_pin=16,
