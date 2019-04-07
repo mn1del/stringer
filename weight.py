@@ -34,6 +34,7 @@ if __name__ == "__main__":
         stepper = Stepper(
                 dir_pin=8, 
                 step_pin=7, 
+                sleep_pin=25,
                 ms1_pin=21, 
                 ms2_pin=20, 
                 ms3_pin=16,
