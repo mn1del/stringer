@@ -16,6 +16,120 @@ from rpigpio import Stepper
 
 import config  # where calibration settings etc are stored
 
+class Stringer():
+    def __init__():
+        """
+        Hardware and behaviour of the stringer. 
+        """
+        # setup hardware
+        GPIO.setmode(GPIO.BCM)
+        self.n_obs = 5
+        self.target_kgs = 23.0
+        self.movement_mm = 0.25  # distance to increment the leadscrew
+        self.leadscrew_lead = 2
+        self.hx = HX711(data=3, clock=2, channel="A", gain=128, printout=False)
+        self.lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=11, e_pin=5)
+        self.rot = RotaryEncoder(clk=7, dt=8, button=25,
+                                 counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
+        self.button = rot.BUTTON_LAST_PRESS
+        self.limit_switch = Button(button_pin=15, pull_up=True, debounce_delay_secs=0.01)
+        self.stepper = Stepper(
+                dir_pin=8, 
+                step_pin=7, 
+                sleep_pin=25,
+                ms1_pin=21, 
+                ms2_pin=20, 
+                ms3_pin=16,
+                steps_per_rev=200,
+                microstep_mode=2,
+                driver="drv8825")
+        
+        # Attempt to read in calibration factors and set mode accordingly
+        try:
+            ### ************* Logic to check existence of calibration factors here ****************
+            self.cal_factor = config.cal_factor
+            self.cal_offset = config.cal_offset
+        except:
+            self.cal_factor = None
+            self.cal_offset = None
+            print("Some sort of problem reading in calibration factors")
+            
+        # define any state variables
+        if (self.cal_factor==None) | (self.cal_offset==None):
+            self.MODE = "calibrating"
+        else:
+            self.MODE = "monitoring"
+        self.go_home()  # go to the home location of the tensioner
+        
+        # start loop:
+        try:
+            while True:
+                if self.MODE == "monitoring":
+                    self.monitor()
+                elif self.MODE == "tensioning":
+                    self.tension()
+                elif self.MODE == "calibrating":
+                    self.calibrate
+                else:
+                    print("Unknown mode!")
+        except KeyboardInterrupt:
+            # code to cleanup here
+        finally:
+            GPIO.cleanup()
+                   
+        
+    def monitor(self):
+        """
+        1) Set self.rot.COUNTER = self.target_kgs * 10
+        2) Brings the tensioner to HOME position & set self.HOME=True  # only if self.HOME==False
+        3) Change the stepper status to SLEEP.
+        
+        Then, while self.MODE=="monitoring":  # loop:
+        4) Display self.target_kgs
+        5) Set self.target_kgs = self.rot.COUNTER / 10
+        6) if self.rot.BUTTON_LAST_PRESS != self.button:
+                if self.rot.BUTTON_LONG_PRESS:
+                    self.MODE = "calibrating"
+                else:
+                    self.MODE = "tensioning"
+        """
+        
+    def tension(self):
+        """
+        pseudo code:
+        -Get current HX711 reading
+        self.rot.COUNTER = self.target_kgs*10
+        
+        While self.MODE == "tensioning":
+            -Get current reading
+            self.target_kgs = self.rot.COUNTER / 10
+            -Display Target & current reading
+            If limit not hit:
+                if current < self.target_kgs:
+                    tighten
+                elif current > self.target_kgs:
+                    loosen
+            else:  # (limit hit)        
+                Display Error Message
+                self.go_home()
+                self.MODE = "monitoring"
+            if self.rot.BUTTON_LAST_PRESS != self.button:
+                if self.rot.BUTTON_LONG_PRESS:
+                    self.MODE = "calibrating"
+                else:
+                    self.go_home()
+                    self.MODE = "monitoring"
+        """
+        
+    def calibrate(self):
+        """
+        """
+        
+    def go_home(self):
+        """
+        Move stepper back until limit is hit, then back off 10mm
+        self.HOME = True
+        """
 
 if __name__ == "__main__":
     try:
