@@ -27,6 +27,7 @@ class Stringer():
         self.target_kgs = 23.0
         self.movement_mm = 0.25  # distance to increment the leadscrew
         self.leadscrew_lead = 2
+        self.steps_per_rev = 400
         self.hx = HX711(data=3, clock=2, channel="A", gain=128, printout=False)
         self.lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=11, e_pin=5)
         self.rot = RotaryEncoder(clk=7, dt=8, button=25,
@@ -97,20 +98,23 @@ class Stringer():
     def tension(self):
         """
         pseudo code:
-        -Get current HX711 reading
+        """
         self.rot.COUNTER = self.target_kgs*10
         
         While self.MODE == "tensioning":
-            -Get current reading
+            self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=5, clip=True))
             self.target_kgs = self.rot.COUNTER / 10
-            -Display Target & current reading
+            lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), lcd.LCD_LINE_1)
+            lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), lcd.LCD_LINE_2)
+
             If limit not hit:
-                if current < self.target_kgs:
-                    tighten
-                elif current > self.target_kgs:
-                    loosen
+                if self.current_kgs < self.target_kgs:
+                    self.increment_stepper(1, 0.25)
+                elif self.current_kgs > self.target_kgs:
+                    self.increment_stepper(-1, 0.25)
             else:  # (limit hit)        
-                Display Error Message
+                lcd.lcd_string("**** Error ****", lcd.LCD_LINE_1)
+                lcd.lcd_string("** Limit Hit **", lcd.LCD_LINE_2)
                 self.go_home()
                 self.MODE = "monitoring"
             if self.rot.BUTTON_LAST_PRESS != self.button:
@@ -119,7 +123,6 @@ class Stringer():
                 else:
                     self.go_home()
                     self.MODE = "monitoring"
-        """
         
     def calibrate(self):
         """
@@ -130,7 +133,31 @@ class Stringer():
         Move stepper back until limit is hit, then back off 10mm
         self.HOME = True
         """
-
+    def raw_to_kgs(self, raw):
+        """
+        converts the raw HX711 reading to kgs
+        
+        args:
+            raw: raw HX711 reading
+        """
+        kgs = max(0,round((raw - cal_offset) / cal_factor,2))
+        return kgs
+    
+    def increment_stepper(self, direction, movement_mm=None):
+        """
+        Helper function to increment the leadscrew forwards
+        
+        args:
+        direction: (int) 1 or -1. 1 for tightening motion. -1 for loosening
+            movement_mm: (float) movement in mm to increment the leadscrew. 
+                         Defaults to self.movement_mm
+        """
+        if movement_mm is None:
+            movement_mm = self.movement_mm
+        direction = (direction + 1) / 2  # convert to 0|1   
+        n_steps = self.steps_per_rev * movement_mm / self.leadscrew_lead 
+        stepper.step(n_steps=n_steps, direction=direction)
+        
 if __name__ == "__main__":
     try:
         GPIO.setmode(GPIO.BCM)
