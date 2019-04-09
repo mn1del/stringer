@@ -38,7 +38,7 @@ class Stringer():
                 counter=self.target_kgs*10,
                 long_press_secs=1.0,
                 debounce_n=2)
-        self.button = rot.BUTTON_LAST_PRESS
+        self.button = self.rot.BUTTON_LAST_PRESS
         # set up normally closed limit switches (allows both switches to share a circuit)
         self.limit_switch = Button(button_pin=15, pull_up=True, debounce_delay_secs=0.01)  
         self.stepper = Stepper(
