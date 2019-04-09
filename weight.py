@@ -175,7 +175,7 @@ class Stringer():
                 else:  # limit hit       
                     lcd.lcd_string("**** Error ****", lcd.LCD_LINE_1)
                     lcd.lcd_string("** Limit Hit **", lcd.LCD_LINE_2)
-                    if direction = 1:
+                    if direction == 1:
                         # implies the far limit was hit
                         far_backoff = self.limit_backoff_mm
                     else:
