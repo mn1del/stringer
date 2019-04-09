@@ -107,6 +107,7 @@ class Stringer():
             self.go_home()
         # put the stepper to sleep
         self.stepper.sleep()
+        print("Rest mode,\nbutton: {}\nLAST_PRESS: {}".format(self.button, self.rot.BUTTON_LAST_PRESS))
         
         # start loop
         while self.MODE == "resting":
@@ -117,6 +118,7 @@ class Stringer():
             self.lcd.lcd_string("press to tension", self.lcd.LCD_LINE_2)
             # check for change in MODE
             if self.rot.BUTTON_LAST_PRESS != self.button:
+                print("BUTTON PRESSED!!!!")
                 if self.rot.BUTTON_LONG_PRESS:
                     self.MODE = "calibrating"
                 else:
@@ -230,7 +232,6 @@ class Stringer():
         """
         # initial back off from far limit switch:
         self.increment_stepper(direction=-1, movement_mm=far_limit_back_off_mm, mm_per_sec=10)
-        print("backed off")
         # Display status
         if not suppress_message:
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
