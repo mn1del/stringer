@@ -32,23 +32,23 @@ class Stringer():
         self.hx = HX711(data=3, clock=2, channel="A", gain=128, printout=False)
         self.lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=11, e_pin=5)
         self.rot = RotaryEncoder(
-                clk=7,
-                dt=8,
-                button=25,
+                clk=18,
+                dt=15,
+                button=14,
                 counter=self.target_kgs*10,
                 long_press_secs=1.0,
                 debounce_n=2)
         self.button = self.rot.BUTTON_LAST_PRESS
         # set up normally closed limit switches (allows both switches to share a circuit)
-        self.limit_switch = Button(button_pin=15, pull_up=True, debounce_delay_secs=0.01)  
+        self.limit_switch = Button(button_pin=12, pull_up=True, debounce_delay_secs=0.01)  
         self.stepper = Stepper(
                 dir_pin=8, 
                 step_pin=7, 
                 sleep_pin=25,
-                ms1_pin=21, 
-                ms2_pin=20, 
-                ms3_pin=16,
-                steps_per_rev=200,
+                ms0_pin=21, 
+                ms1_pin=20, 
+                ms2_pin=16,
+                steps_per_rev=self.steps_per_rev,
                 microstep_mode=2,
                 driver="drv8825")
 
