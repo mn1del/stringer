@@ -17,7 +17,7 @@ from rpigpio import Stepper
 import config  # where calibration settings etc are stored
 
 class Stringer():
-    def __init__():
+    def __init__(self):
         """
         Hardware and behaviour of the stringer. 
         """
