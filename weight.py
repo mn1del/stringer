@@ -133,6 +133,8 @@ class Stringer():
         while self.MODE == "tensioning":
             self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=5, clip=True))
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
+            print("current: {}\ntarget: {}\nCOUNTER: {}".format(
+                self.current_kgs, self.target_kgs, self.rot.COUNTER))
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
 
