@@ -133,15 +133,17 @@ class Stringer():
         while self.MODE == "tensioning":
             self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=5, clip=True))
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
-            print("current: {}\ntarget: {}\nCOUNTER: {}".format(
-                self.current_kgs, self.target_kgs, self.rot.COUNTER))
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
+            print("limit_switch: {}".format(self.limit_switch_triggered(self.limit_switch))
 
             if not self.limit_switch_triggered(self.limit_switch):
+                print("limit not hit")
                 if self.current_kgs < self.target_kgs:
+                    print("tighten")
                     self.increment_stepper(1, self.movement_mm)
                 elif self.current_kgs > self.target_kgs:
+                    print("loosen")
                     self.increment_stepper(-1, self.movement_mm)
             else:  # limit hit       
                 self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
