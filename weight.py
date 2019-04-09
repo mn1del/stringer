@@ -124,7 +124,7 @@ class Stringer():
         """
         self.rot.COUNTER = self.target_kgs*10
         
-        While self.MODE == "tensioning":
+        while self.MODE == "tensioning":
             self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=5, clip=True))
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
             lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), lcd.LCD_LINE_1)
@@ -230,7 +230,7 @@ class Stringer():
             lcd.lcd_string("***RETURNING***", lcd.LCD_LINE_1)
             lcd.lcd_string("*****HOME******", lcd.LCD_LINE_2)
         # increment backwards until near limit triggered:
-        While not limit_switch_triggered(self.limit_switch):
+        while not limit_switch_triggered(self.limit_switch):
             self.increment_stepper(direction=-1, movement_mm=0.5)
         # finally back off near limit switch     
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm)
