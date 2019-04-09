@@ -140,10 +140,10 @@ class Stringer():
             if not self.limit_switch_triggered(self.limit_switch):
                 if self.current_kgs < self.target_kgs:
                     print("tighten")
-                    self.increment_stepper(1, self.movement_mm)
+                    self.increment_stepper(1, self.movement_mm, 2)
                 elif self.current_kgs > self.target_kgs:
                     print("loosen")
-                    self.increment_stepper(-1, self.movement_mm)
+                    self.increment_stepper(-1, self.movement_mm, 2)
             else:  # limit hit       
                 self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
@@ -260,7 +260,7 @@ class Stringer():
         kgs = max(0,round((raw - self.cal_offset) / self.cal_factor,2))
         return kgs
     
-    def increment_stepper(self, direction, movement_mm=None, mm_per_sec=10):
+    def increment_stepper(self, direction, movement_mm=None, mm_per_sec=5):
         """
         Helper function to increment the leadscrew forwards.
         Sets HOME to False, to register that the position has changed.
