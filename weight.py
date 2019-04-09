@@ -113,8 +113,8 @@ class Stringer():
             # control target_kgs with the rotary encoder
             self.target_kgs = self.rot.COUNTER/10
             # display target_kgs
-            lcd.lcd_string("Target: {:,.1f} kgs".format(self.target_kgs), lcd.LCD_LINE_1)
-            lcd.lcd_string("press to tension", lcd.LCD_LINE_2)
+            self.lcd.lcd_string("Target: {:,.1f} kgs".format(self.target_kgs), self.lcd.LCD_LINE_1)
+            self.lcd.lcd_string("press to tension", self.lcd.LCD_LINE_2)
             # check for change in MODE
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 if self.rot.BUTTON_LONG_PRESS:
@@ -132,8 +132,8 @@ class Stringer():
         while self.MODE == "tensioning":
             self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=5, clip=True))
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
-            lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), lcd.LCD_LINE_1)
-            lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), lcd.LCD_LINE_2)
+            self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
+            self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
 
             if not self.limit_switch_triggered(self.limit_switch):
                 if self.current_kgs < self.target_kgs:
@@ -141,8 +141,8 @@ class Stringer():
                 elif self.current_kgs > self.target_kgs:
                     self.increment_stepper(-1, self.movement_mm)
             else:  # limit hit       
-                lcd.lcd_string("**** Error ****", lcd.LCD_LINE_1)
-                lcd.lcd_string("** Limit Hit **", lcd.LCD_LINE_2)
+                self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
+                self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
                 self.go_home(far_limit_back_off_mm=self.limit_backoff_mm)
                 self.MODE = "resting"
             if self.rot.BUTTON_LAST_PRESS != self.button:
@@ -168,8 +168,8 @@ class Stringer():
         
         while self.MODE == "calibrating":
             while calibration_step == 0:  # Control tension directly
-                lcd.lcd_string("turn to tension", lcd.LCD_LINE_1)
-                lcd.lcd_string("and press", lcd.LCD_LINE_2)
+                self.lcd.lcd_string("turn to tension", self.lcd.LCD_LINE_1)
+                self.lcd.lcd_string("and press", self.lcd.LCD_LINE_2)
                 if not self.limit_switch_triggered(self.limit_switch):
                     if self.rot.COUNTER < counter:
                         direction = -1
@@ -178,8 +178,8 @@ class Stringer():
                         direction = 1
                         self.increment_stepper(direction, self.movement_mm)
                 else:  # limit hit       
-                    lcd.lcd_string("**** Error ****", lcd.LCD_LINE_1)
-                    lcd.lcd_string("** Limit Hit **", lcd.LCD_LINE_2)
+                    self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
+                    self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
                     if direction == 1:
                         # implies the far limit was hit
                         far_backoff = self.limit_backoff_mm
@@ -192,17 +192,17 @@ class Stringer():
                         calibration_step = 1
             while calibration_step == 1:
                 self.rot.COUNTER = 200  # 20 kgs starting default
-                lcd.lcd_string("known tension:", lcd.LCD_LINE_1)
-                lcd.lcd_string(
+                self.lcd.lcd_string("known tension:", self.lcd.LCD_LINE_1)
+                self.lcd.lcd_string(
                     "{:,.1f} kgs".format(max(0,min(500, self.rot.COUNTER))/10), 
-                    lcd.LCD_LINE_2)
+                    self.lcd.LCD_LINE_2)
                 if self.rot.BUTTON_LAST_PRESS != self.button:
                         known_weight = max(0,min(500, self.rot.COUNTER))/10
                         cal_readings.append([known_weight, self.hx.get_reading(n_obs=9, clip=True)])
                         calibration_step = 2
             while calibration_step == 2:
-                lcd.lcd_string("press when", lcd.LCD_LINE_1)
-                lcd.lcd_string("tension is zero", lcd.LCD_LINE_2)
+                self.lcd.lcd_string("press when", self.lcd.LCD_LINE_1)
+                self.lcd.lcd_string("tension is zero", self.lcd.LCD_LINE_2)
                 self.go_home(suppress_message=True)
                 if self.rot.BUTTON_LAST_PRESS != self.button:
                         known_weight = 0
@@ -228,12 +228,14 @@ class Stringer():
                                    Default zero results in no initial far limit backoff
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
+        print("go_home")
         # initial back off from far limit switch:
         self.increment_stepper(direction=-1, movement_mm=far_limit_back_off_mm)
+        print("backed off")
         # Display status
         if not suppress_message:
-            lcd.lcd_string("***RETURNING***", lcd.LCD_LINE_1)
-            lcd.lcd_string("*****HOME******", lcd.LCD_LINE_2)
+            self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
+            self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # increment backwards until near limit triggered:
         while not limit_switch_triggered(self.limit_switch):
             self.increment_stepper(direction=-1, movement_mm=0.5)
