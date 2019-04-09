@@ -215,7 +215,7 @@ class Stringer():
             # now that we have two calibration readings:
             self.cal_factor = (cal_readings[1][1] - cal_readings[0][1]) \
                     / (cal_readings[1][0] - cal_readings[0][0])
-            self.cal_offset = cal_readings[1][1] - cal_factor * cal_readings[1][0]
+            self.cal_offset = cal_readings[1][1] - self.cal_factor * cal_readings[1][0]
             # store new calibration variables in config.py
             with open("config.py", "w") as f:
                 f.write("cal_factor={}\ncal_offset={}".format(self.cal_factor, self.cal_offset))
@@ -252,7 +252,7 @@ class Stringer():
         args:
             raw: raw HX711 reading
         """
-        kgs = max(0,round((raw - cal_offset) / cal_factor,2))
+        kgs = max(0,round((raw - self.cal_offset) / self.cal_factor,2))
         return kgs
     
     def increment_stepper(self, direction, movement_mm=None, mm_per_sec=10):
