@@ -90,8 +90,8 @@ class Stringer():
             pass
         finally:
             self.stepper.sleep()
-            lcd.cleanup()
-            hx.cleanup()
+            self.lcd.cleanup()
+            self.hx.cleanup()
             GPIO.cleanup()
                    
     def rest(self):
