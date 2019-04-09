@@ -61,7 +61,7 @@ class Stringer():
         if (self.cal_factor==None) | (self.cal_offset==None):
             self.MODE = "calibrating"
         else:
-            self.MODE = "monitoring"
+            self.MODE = "resting"
         self.go_home()  # go to the home location of the tensioner
             
     def start(self):
@@ -70,8 +70,8 @@ class Stringer():
         """
         try:
             while True:
-                if self.MODE == "monitoring":
-                    self.monitor()
+                if self.MODE == "resting":
+                    self.rest()
                 elif self.MODE == "tensioning":
                     self.tension()
                 elif self.MODE == "calibrating":
@@ -83,13 +83,13 @@ class Stringer():
         finally:
             GPIO.cleanup()
                    
-    def monitor(self):
+    def rest(self):
         """
-        1) Set self.rot.COUNTER = self.target_kgs * 10
-        2) Brings the tensioner to HOME position & set self.HOME=True  # only if self.HOME==False
-        3) Change the stepper status to SLEEP.
+        HOMEs the tensioner, SLEEPs the stepper, and allows target_kgs to be changed
+        with the rotary encoder. Then just awaits a button press to either start
+        tensioning or calibrating
         
-        Then, while self.MODE=="monitoring":  # loop:
+        Then, while self.MODE=="resting":  # loop:
         4) Display self.target_kgs
         5) Set self.target_kgs = self.rot.COUNTER / 10
         6) if self.rot.BUTTON_LAST_PRESS != self.button:
@@ -98,10 +98,32 @@ class Stringer():
                 else:
                     self.MODE = "tensioning"
         """
+        # initialize rot.COUNTER
+        self.rot.COUNTER = self.target_kgs * 10
+        # HOME the tensioner if necessary
+        if not self.HOME:
+            self.go_home()
+        # put the stepper to sleep
+        self.stepper.sleep()
+        
+        # start loop
+        while self.MODE == "resting":
+            # control target_kgs with the rotary encoder
+            self.target_kgs = self.rot.COUNTER/10
+            # display target_kgs
+            lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), lcd.LCD_LINE_1)
+            lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), lcd.LCD_LINE_2)
+            # check for change in MODE
+            if self.rot.BUTTON_LAST_PRESS != self.button:
+                if self.rot.BUTTON_LONG_PRESS:
+                    self.MODE = "calibrating"
+                else:
+                    self.MODE = "tensioning"
         
     def tension(self):
         """
-        Initialize rotary encoder counter with target_kgs and start tensioning logic loop
+        Initialize rotary encoder counter with target_kgs and start tensioning logic loop.
+        target_kgs can be dynamically managed with the rotary encoder.
         """
         self.rot.COUNTER = self.target_kgs*10
         
@@ -113,20 +135,21 @@ class Stringer():
 
             If not self.limit_switch_triggered(self.limit_switch):
                 if self.current_kgs < self.target_kgs:
-                    self.increment_stepper(1, 0.25)
+                    self.increment_stepper(1, self.movement_mm)
                 elif self.current_kgs > self.target_kgs:
-                    self.increment_stepper(-1, 0.25)
-            else:  # (limit hit)        
+                    self.increment_stepper(-1, self.movement_mm)
+            else:  # limit hit       
                 lcd.lcd_string("**** Error ****", lcd.LCD_LINE_1)
                 lcd.lcd_string("** Limit Hit **", lcd.LCD_LINE_2)
                 self.go_home(far_limit_back_off_mm=self.limit_backoff_mm)
-                self.MODE = "monitoring"
+                self.MODE = "resting"
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 if self.rot.BUTTON_LONG_PRESS:
+                    # The stepper remains energized in the current position
                     self.MODE = "calibrating"
                 else:
                     self.go_home()
-                    self.MODE = "monitoring"
+                    self.MODE = "resting"
 
     def calibrate(self):
         """
@@ -134,13 +157,12 @@ class Stringer():
         
     def go_home(self, far_limit_back_off_mm=0):
         """
-        Returns the tensioner to its home position, using the limit switch as a guide
+        Returns the tensioner to its home position, using the limit switch as a guide.
+        Sets HOME state.
         
         args:
             far_limit_back_off_mm: (float) mm to back off the far limit switch first.
                                    Default zero results in no initial far limit backoff
-        Move stepper back until limit is hit, then back off 10mm
-        self.HOME = True
         """
         # initial back off from far limit switch:
         self.increment_stepper(direction=-1, movement_mm=far_limit_back_off_mm)
@@ -149,7 +171,8 @@ class Stringer():
             self.increment_stepper(direction=-1, movement_mm=0.5)
         # finally back off near limit switch     
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm)
-        
+        # set HOME state
+        self.HOME = True
         
     def raw_to_kgs(self, raw):
         """
@@ -163,7 +186,8 @@ class Stringer():
     
     def increment_stepper(self, direction, movement_mm=None):
         """
-        Helper function to increment the leadscrew forwards
+        Helper function to increment the leadscrew forwards.
+        Sets HOME to False, to register that the position has changed.
         
         args:
         direction: (int) 1 or -1. 1 for tightening motion. -1 for loosening
@@ -175,6 +199,7 @@ class Stringer():
         direction = (direction + 1) / 2  # convert to 0|1   
         n_steps = self.steps_per_rev * movement_mm / self.leadscrew_lead 
         stepper.step(n_steps=n_steps, direction=direction)
+        self.HOME = False
         
     def limit_switch_triggered(self, limit_switch):
         """
