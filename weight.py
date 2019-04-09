@@ -135,7 +135,7 @@ class Stringer():
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
-            print("limit_switch: {}".format(self.limit_switch_triggered(self.limit_switch))
+            print("limit_switch: {}".format(self.limit_switch_triggered(self.limit_switch)))
 
             if not self.limit_switch_triggered(self.limit_switch):
                 print("limit not hit")
