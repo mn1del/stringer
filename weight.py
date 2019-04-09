@@ -228,7 +228,6 @@ class Stringer():
                                    Default zero results in no initial far limit backoff
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
-        print("go_home")
         # initial back off from far limit switch:
         self.increment_stepper(direction=-1, movement_mm=far_limit_back_off_mm)
         print("backed off")
@@ -268,6 +267,8 @@ class Stringer():
             movement_mm = self.movement_mm
         direction = (direction + 1) / 2  # convert to 0|1   
         n_steps = self.steps_per_rev * movement_mm / self.leadscrew_lead 
+        print("movement_mm: {}\ndir: {}\nn_steps: {}".format(
+            movement_mm, direction, n_steps))
         self.stepper.step(n_steps=n_steps, direction=direction)
         self.HOME = False
         
