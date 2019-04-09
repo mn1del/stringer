@@ -89,7 +89,7 @@ class Stringer():
             print("Something went wrong in the master loop")
             pass
         finally:
-            stepper.sleep()
+            self.stepper.sleep()
             lcd.cleanup()
             hx.cleanup()
             GPIO.cleanup()
