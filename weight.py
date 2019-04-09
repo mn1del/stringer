@@ -26,6 +26,7 @@ class Stringer():
         self.n_obs = 5
         self.target_kgs = 23.0
         self.movement_mm = 0.25  # distance to increment the leadscrew
+        self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
         self.steps_per_rev = 400
         self.hx = HX711(data=3, clock=2, channel="A", gain=128, printout=False)
@@ -33,7 +34,8 @@ class Stringer():
         self.rot = RotaryEncoder(clk=7, dt=8, button=25,
                                  counter=target_kgs*10, long_press_secs=1.0, debounce_n=2)
         self.button = rot.BUTTON_LAST_PRESS
-        self.limit_switch = Button(button_pin=15, pull_up=True, debounce_delay_secs=0.01)
+        # set up normally closed limit switches (allows both switches to share a circuit)
+        self.limit_switch = Button(button_pin=15, pull_up=True, debounce_delay_secs=0.01)  
         self.stepper = Stepper(
                 dir_pin=8, 
                 step_pin=7, 
@@ -61,8 +63,11 @@ class Stringer():
         else:
             self.MODE = "monitoring"
         self.go_home()  # go to the home location of the tensioner
-        
-        # start loop:
+            
+    def start(self):
+        """
+        Start the logic loop
+        """
         try:
             while True:
                 if self.MODE == "monitoring":
@@ -78,7 +83,6 @@ class Stringer():
         finally:
             GPIO.cleanup()
                    
-        
     def monitor(self):
         """
         1) Set self.rot.COUNTER = self.target_kgs * 10
@@ -97,7 +101,7 @@ class Stringer():
         
     def tension(self):
         """
-        pseudo code:
+        Initialize rotary encoder counter with target_kgs and start tensioning logic loop
         """
         self.rot.COUNTER = self.target_kgs*10
         
@@ -107,7 +111,7 @@ class Stringer():
             lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), lcd.LCD_LINE_1)
             lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), lcd.LCD_LINE_2)
 
-            If limit not hit:
+            If not self.limit_switch_triggered(self.limit_switch):
                 if self.current_kgs < self.target_kgs:
                     self.increment_stepper(1, 0.25)
                 elif self.current_kgs > self.target_kgs:
@@ -115,7 +119,7 @@ class Stringer():
             else:  # (limit hit)        
                 lcd.lcd_string("**** Error ****", lcd.LCD_LINE_1)
                 lcd.lcd_string("** Limit Hit **", lcd.LCD_LINE_2)
-                self.go_home()
+                self.go_home(far_limit_back_off_mm=self.limit_backoff_mm)
                 self.MODE = "monitoring"
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 if self.rot.BUTTON_LONG_PRESS:
@@ -123,16 +127,30 @@ class Stringer():
                 else:
                     self.go_home()
                     self.MODE = "monitoring"
-        
+
     def calibrate(self):
         """
         """
         
-    def go_home(self):
+    def go_home(self, far_limit_back_off_mm=0):
         """
+        Returns the tensioner to its home position, using the limit switch as a guide
+        
+        args:
+            far_limit_back_off_mm: (float) mm to back off the far limit switch first.
+                                   Default zero results in no initial far limit backoff
         Move stepper back until limit is hit, then back off 10mm
         self.HOME = True
         """
+        # initial back off from far limit switch:
+        self.increment_stepper(direction=-1, movement_mm=far_limit_back_off_mm)
+        # increment backwards until near limit triggered:
+        While not limit_switch_triggered(self.limit_switch):
+            self.increment_stepper(direction=-1, movement_mm=0.5)
+        # finally back off near limit switch     
+        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm)
+        
+        
     def raw_to_kgs(self, raw):
         """
         converts the raw HX711 reading to kgs
@@ -157,6 +175,24 @@ class Stringer():
         direction = (direction + 1) / 2  # convert to 0|1   
         n_steps = self.steps_per_rev * movement_mm / self.leadscrew_lead 
         stepper.step(n_steps=n_steps, direction=direction)
+        
+    def limit_switch_triggered(self, limit_switch):
+        """
+        Returns boolean indicating whether limit switch has been triggered.
+        Logic is consistent with a normally closed switch with internal pullup.
+        i.e. Trigger => logic LOW
+        
+        args:
+            limit_switch: Button object instance
+        """
+        if limit_switch.STATE:
+            # Normally closed loop has been broken by limit switch trigger. 
+            # Therefore internall pull-up pulls the pin HIGH
+            triggered = True
+        else:
+            # Unbroken normally closed loop pulling the pin to ground (i.e. LOW)
+            triggered = False
+        return triggered          
         
 if __name__ == "__main__":
     try:
