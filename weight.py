@@ -229,7 +229,7 @@ class Stringer():
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
         # initial back off from far limit switch:
-        self.increment_stepper(direction=-1, movement_mm=far_limit_back_off_mm)
+        self.increment_stepper(direction=-1, movement_mm=far_limit_back_off_mm, mm_per_sec=10)
         print("backed off")
         # Display status
         if not suppress_message:
@@ -237,9 +237,9 @@ class Stringer():
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # increment backwards until near limit triggered:
         while not self.limit_switch_triggered(self.limit_switch):
-            self.increment_stepper(direction=-1, movement_mm=0.5)
+            self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=10)
         # finally back off near limit switch     
-        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm)
+        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=10)
         # set HOME state
         self.HOME = True
         
@@ -253,23 +253,27 @@ class Stringer():
         kgs = max(0,round((raw - cal_offset) / cal_factor,2))
         return kgs
     
-    def increment_stepper(self, direction, movement_mm=None):
+    def increment_stepper(self, direction, movement_mm=None, mm_per_sec=10):
         """
         Helper function to increment the leadscrew forwards.
         Sets HOME to False, to register that the position has changed.
         
         args:
         direction: (int) 1 or -1. 1 for tightening motion. -1 for loosening
-            movement_mm: (float) movement in mm to increment the leadscrew. 
-                         Defaults to self.movement_mm
+        movement_mm: (float) movement in mm to increment the leadscrew. 
+                     Defaults to self.movement_mm
+        mm_per_sec: (int) determines inter step pause length             
         """
+        pause_len = 0.5/(self.steps_per_rev * mm_per_sec/self.leadscrew_lead)
         if movement_mm is None:
             movement_mm = self.movement_mm
         direction = int((direction + 1) / 2)  # convert to 0|1   
         n_steps = int(self.steps_per_rev * movement_mm / self.leadscrew_lead)
-        print("movement_mm: {}\ndir: {}\nn_steps: {}".format(
-            movement_mm, direction, n_steps))
-        self.stepper.step(n_steps=n_steps, direction=direction)
+        self.stepper.step(
+                n_steps=n_steps,
+                direction=direction,
+                inter_step_pause=pause_len,
+                high_pause=pause_len)
         self.HOME = False
         
     def limit_switch_triggered(self, limit_switch):
