@@ -265,8 +265,8 @@ class Stringer():
         """
         if movement_mm is None:
             movement_mm = self.movement_mm
-        direction = (direction + 1) / 2  # convert to 0|1   
-        n_steps = self.steps_per_rev * movement_mm / self.leadscrew_lead 
+        direction = int((direction + 1) / 2)  # convert to 0|1   
+        n_steps = int(self.steps_per_rev * movement_mm / self.leadscrew_lead)
         print("movement_mm: {}\ndir: {}\nn_steps: {}".format(
             movement_mm, direction, n_steps))
         self.stepper.step(n_steps=n_steps, direction=direction)
