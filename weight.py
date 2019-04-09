@@ -117,6 +117,7 @@ class Stringer():
             self.lcd.lcd_string("press to tension", self.lcd.LCD_LINE_2)
             # check for change in MODE
             if self.rot.BUTTON_LAST_PRESS != self.button:
+                self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
                     self.MODE = "calibrating"
                 else:
@@ -135,10 +136,8 @@ class Stringer():
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
-            print("limit_switch: {}".format(self.limit_switch_triggered(self.limit_switch)))
 
             if not self.limit_switch_triggered(self.limit_switch):
-                print("limit not hit")
                 if self.current_kgs < self.target_kgs:
                     print("tighten")
                     self.increment_stepper(1, self.movement_mm)
@@ -146,13 +145,12 @@ class Stringer():
                     print("loosen")
                     self.increment_stepper(-1, self.movement_mm)
             else:  # limit hit       
-                print("limit hit!")
                 self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
                 self.go_home(far_limit_back_off_mm=self.limit_backoff_mm)
                 self.MODE = "resting"
             if self.rot.BUTTON_LAST_PRESS != self.button:
-                print("button press")
+                self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
                     # The stepper remains energized in the current position
                     self.MODE = "calibrating"
@@ -196,6 +194,7 @@ class Stringer():
                     self.go_home(far_limit_back_off_mm=far_backoff)
                     self.MODE = "resting"
                     if self.rot.BUTTON_LAST_PRESS != self.button:
+                        self.button = self.rot.BUTTON_LAST_PRESS
                         calibration_step = 1
             while calibration_step == 1:
                 self.rot.COUNTER = 200  # 20 kgs starting default
@@ -204,17 +203,19 @@ class Stringer():
                     "{:,.1f} kgs".format(max(0,min(500, self.rot.COUNTER))/10), 
                     self.lcd.LCD_LINE_2)
                 if self.rot.BUTTON_LAST_PRESS != self.button:
-                        known_weight = max(0,min(500, self.rot.COUNTER))/10
-                        cal_readings.append([known_weight, self.hx.get_reading(n_obs=9, clip=True)])
-                        calibration_step = 2
+                    self.button = self.rot.BUTTON_LAST_PRESS
+                    known_weight = max(0,min(500, self.rot.COUNTER))/10
+                    cal_readings.append([known_weight, self.hx.get_reading(n_obs=9, clip=True)])
+                    calibration_step = 2
             while calibration_step == 2:
                 self.lcd.lcd_string("press when", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("tension is zero", self.lcd.LCD_LINE_2)
                 self.go_home(suppress_message=True)
                 if self.rot.BUTTON_LAST_PRESS != self.button:
-                        known_weight = 0
-                        cal_readings.append([known_weight, self.hx.get_reading(n_obs=9, clip=True)])
-                        calibration_step = 3
+                    self.button = self.rot.BUTTON_LAST_PRESS
+                    known_weight = 0
+                    cal_readings.append([known_weight, self.hx.get_reading(n_obs=9, clip=True)])
+                    calibration_step = 3
 
             # now that we have two calibration readings:
             self.cal_factor = (cal_readings[1][1] - cal_readings[0][1]) \
