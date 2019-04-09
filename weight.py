@@ -130,7 +130,7 @@ class Stringer():
             lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), lcd.LCD_LINE_1)
             lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), lcd.LCD_LINE_2)
 
-            If not self.limit_switch_triggered(self.limit_switch):
+            if not self.limit_switch_triggered(self.limit_switch):
                 if self.current_kgs < self.target_kgs:
                     self.increment_stepper(1, self.movement_mm)
                 elif self.current_kgs > self.target_kgs:
@@ -165,7 +165,7 @@ class Stringer():
             while calibration_step == 0:  # Control tension directly
                 lcd.lcd_string("turn to tension", lcd.LCD_LINE_1)
                 lcd.lcd_string("and press", lcd.LCD_LINE_2)
-                If not self.limit_switch_triggered(self.limit_switch):
+                if not self.limit_switch_triggered(self.limit_switch):
                     if self.rot.COUNTER < counter:
                         direction = -1
                         self.increment_stepper(direction, self.movement_mm)
