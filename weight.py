@@ -127,7 +127,7 @@ class Stringer():
         Initialize rotary encoder counter with target_kgs and start tensioning logic loop.
         target_kgs can be dynamically managed with the rotary encoder.
         """
-        print("In tensioning mode")
+        print("In tensioning mode\ntarget_kgs: {}".format(self.target_kgs))
         self.rot.COUNTER = self.target_kgs*10
         
         while self.MODE == "tensioning":
