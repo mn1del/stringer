@@ -146,11 +146,13 @@ class Stringer():
                     print("loosen")
                     self.increment_stepper(-1, self.movement_mm)
             else:  # limit hit       
+                print("limit hit!")
                 self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
                 self.go_home(far_limit_back_off_mm=self.limit_backoff_mm)
                 self.MODE = "resting"
             if self.rot.BUTTON_LAST_PRESS != self.button:
+                print("button press")
                 if self.rot.BUTTON_LONG_PRESS:
                     # The stepper remains energized in the current position
                     self.MODE = "calibrating"
