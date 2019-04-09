@@ -119,6 +119,8 @@ class Stringer():
             # check for change in MODE
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 print("BUTTON PRESSED!!!!")
+                print("Rest mode,\nbutton: {}\nLAST_PRESS: {}".format(self.button, self.rot.BUTTON_LAST_PRESS))
+                print("Long press: {}".format(self.rot.BUTTON_LONG_PRESS))
                 if self.rot.BUTTON_LONG_PRESS:
                     self.MODE = "calibrating"
                 else:
