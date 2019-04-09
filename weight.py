@@ -107,7 +107,6 @@ class Stringer():
             self.go_home()
         # put the stepper to sleep
         self.stepper.sleep()
-        print("Rest mode,\nbutton: {}\nLAST_PRESS: {}".format(self.button, self.rot.BUTTON_LAST_PRESS))
         
         # start loop
         while self.MODE == "resting":
@@ -118,9 +117,6 @@ class Stringer():
             self.lcd.lcd_string("press to tension", self.lcd.LCD_LINE_2)
             # check for change in MODE
             if self.rot.BUTTON_LAST_PRESS != self.button:
-                print("BUTTON PRESSED!!!!")
-                print("Rest mode,\nbutton: {}\nLAST_PRESS: {}".format(self.button, self.rot.BUTTON_LAST_PRESS))
-                print("Long press: {}".format(self.rot.BUTTON_LONG_PRESS))
                 if self.rot.BUTTON_LONG_PRESS:
                     self.MODE = "calibrating"
                 else:
@@ -131,6 +127,7 @@ class Stringer():
         Initialize rotary encoder counter with target_kgs and start tensioning logic loop.
         target_kgs can be dynamically managed with the rotary encoder.
         """
+        print("In tensioning mode")
         self.rot.COUNTER = self.target_kgs*10
         
         while self.MODE == "tensioning":
