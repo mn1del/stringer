@@ -25,7 +25,7 @@ class Stringer():
         GPIO.setmode(GPIO.BCM)
         self.n_obs = 5
         self.target_kgs = 20.0
-        self.movement_mm = 0.25  # distance to increment the leadscrew
+        self.movement_mm = 0.05  # distance to increment the leadscrew
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
         self.steps_per_rev = 400
