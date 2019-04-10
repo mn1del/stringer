@@ -150,7 +150,7 @@ class Stringer():
             else:  # tighten/loosen
                 if self.current_kgs < self.target_kgs:
                     print("tighten")
-                    self.increment_stepper(1, self.movement_mm, 100)
+                    self.increment_stepper(1, self.movement_mm*10, 100)
                 elif self.current_kgs > self.target_kgs:
                     print("loosen")
                     self.increment_stepper(-1, self.movement_mm, 2)
