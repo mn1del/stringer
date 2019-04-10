@@ -40,7 +40,8 @@ class Stringer():
                 debounce_n=2)
         self.button = self.rot.BUTTON_LAST_PRESS
         # set up normally closed limit switches (allows both switches to share a circuit)
-        self.limit_switch = Button(button_pin=12, pull_up=True, debounce_delay_secs=0.01)  
+        self.near_limit_switch = Button(button_pin=23, pull_up=True, debounce_delay_secs=0.01)  
+        self.far_limit_switch = Button(button_pin=24, pull_up=True, debounce_delay_secs=0.01)  
         self.stepper = Stepper(
                 dir_pin=8, 
                 step_pin=7, 
@@ -138,18 +139,20 @@ class Stringer():
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
 
-            if not self.limit_switch_triggered(self.limit_switch):
+            if (self.limit_switch_triggered(self.near_limit_switch)) \
+                    | (self.limit_switch_triggered(self.far_limit_switch)):
+                self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
+                self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
+                time.sleep(0.5)
+                self.go_home()
+                self.MODE = "resting"
+            else:  # tighten/loosen
                 if self.current_kgs < self.target_kgs:
                     print("tighten")
                     self.increment_stepper(1, self.movement_mm, 2)
                 elif self.current_kgs > self.target_kgs:
                     print("loosen")
                     self.increment_stepper(-1, self.movement_mm, 2)
-            else:  # limit hit       
-                self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
-                self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
-                self.go_home(far_limit_back_off_mm=self.limit_backoff_mm)
-                self.MODE = "resting"
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
@@ -176,27 +179,23 @@ class Stringer():
             while calibration_step == 0:  # Control tension directly
                 self.lcd.lcd_string("turn to tension", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("and press", self.lcd.LCD_LINE_2)
-                if not self.limit_switch_triggered(self.limit_switch):
+                if (self.limit_switch_triggered(self.near_limit_switch)) \
+                        | (self.limit_switch_triggered(self.far_limit_switch)):
+                    self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
+                    self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
+                    time.sleep(0.5)
+                    self.go_home()
+                    self.MODE = "resting"
+                else:
                     if self.rot.COUNTER < counter:
                         direction = -1
                         self.increment_stepper(direction, self.movement_mm)
                     elif self.rot.COUNTER > counter:
                         direction = 1
                         self.increment_stepper(direction, self.movement_mm)
-                else:  # limit hit       
-                    self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
-                    self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
-                    if direction == 1:
-                        # implies the far limit was hit
-                        far_backoff = self.limit_backoff_mm
-                    else:
-                        # implies near limit hit, therefore no need to back off
-                        far_backoff = 0
-                    self.go_home(far_limit_back_off_mm=far_backoff)
-                    self.MODE = "resting"
-                    if self.rot.BUTTON_LAST_PRESS != self.button:
-                        self.button = self.rot.BUTTON_LAST_PRESS
-                        calibration_step = 1
+                if self.rot.BUTTON_LAST_PRESS != self.button:
+                    self.button = self.rot.BUTTON_LAST_PRESS
+                    calibration_step = 1
             while calibration_step == 1:
                 self.rot.COUNTER = 200  # 20 kgs starting default
                 self.lcd.lcd_string("known tension:", self.lcd.LCD_LINE_1)
@@ -227,7 +226,7 @@ class Stringer():
                 f.write("cal_factor={}\ncal_offset={}".format(self.cal_factor, self.cal_offset))
             self.MODE = "resting"    
         
-    def go_home(self, far_limit_back_off_mm=0, suppress_message=False):
+    def go_home(self, suppress_message=False):
         """
         Returns the tensioner to its home position, using the limit switch as a guide.
         Sets HOME state.
@@ -238,17 +237,17 @@ class Stringer():
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
         # initial back off from far limit switch:
-        self.increment_stepper(direction=-1, movement_mm=far_limit_back_off_mm, mm_per_sec=10)
+        if self.limit_switch_triggered(self.far_limit_switch):
+        self.increment_stepper(direction=-1, movement_mm=self.limit_backoff_mm, mm_per_sec=10)
         # Display status
         if not suppress_message:
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # increment backwards until near limit triggered:
-        while not self.limit_switch_triggered(self.limit_switch):
+        while not self.limit_switch_triggered(self.near_limit_switch):
             self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=10)
         # finally back off near limit switch     
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=10)
-        # set HOME state
         self.HOME = True
         
     def raw_to_kgs(self, raw):
