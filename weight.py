@@ -238,7 +238,7 @@ class Stringer():
         """
         # initial back off from far limit switch:
         if self.limit_switch_triggered(self.far_limit_switch):
-        self.increment_stepper(direction=-1, movement_mm=self.limit_backoff_mm, mm_per_sec=10)
+            self.increment_stepper(direction=-1, movement_mm=self.limit_backoff_mm, mm_per_sec=10)
         # Display status
         if not suppress_message:
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
