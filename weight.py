@@ -136,7 +136,6 @@ class Stringer():
             print(self.hx.get_reading(n_obs=3, clip=True))
             self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=3, clip=True))
             print(self.current_kgs)
-            print(self.raw_to_kgs(self.hx.get_reading(n_obs=3, clip=True)))
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
@@ -151,7 +150,7 @@ class Stringer():
             else:  # tighten/loosen
                 if self.current_kgs < self.target_kgs:
                     print("tighten")
-                    self.increment_stepper(1, self.movement_mm, 2)
+                    self.increment_stepper(1, self.movement_mm, 10)
                 elif self.current_kgs > self.target_kgs:
                     print("loosen")
                     self.increment_stepper(-1, self.movement_mm, 2)
