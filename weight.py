@@ -260,7 +260,7 @@ class Stringer():
         args:
             raw: raw HX711 reading
         """
-        kgs = round(max(0,(raw - self.cal_offset) / self.cal_factor),2)
+        kgs = max(0,(raw - self.cal_offset) / self.cal_factor)
         return kgs
     
     def increment_stepper(self, direction, movement_mm=None, mm_per_sec=5):
