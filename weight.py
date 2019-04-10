@@ -82,7 +82,7 @@ class Stringer():
                 elif self.MODE == "tensioning":
                     self.tension()
                 elif self.MODE == "calibrating":
-                    self.calibrate
+                    self.calibrate()
                 else:
                     print("Unknown mode!")
         except:
