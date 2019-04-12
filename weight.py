@@ -194,10 +194,11 @@ class Stringer():
                     elif self.rot.COUNTER > counter:
                         direction = 1
                         self.increment_stepper(direction, self.movement_mm)
-                if self.rot.BUTTON_LAST_PRESS != self.button:
-                    self.button = self.rot.BUTTON_LAST_PRESS
-                    calibration_step = 1
-            while calibration_step == 1:
+                    counter = self.rot.COUNTER
+                    if self.rot.BUTTON_LAST_PRESS != self.button:
+                        self.button = self.rot.BUTTON_LAST_PRESS
+                        calibration_step = 1
+            while calibration_step == 1:  # enter known weight
                 self.rot.COUNTER = 200  # 20 kgs starting default
                 self.lcd.lcd_string("known tension:", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string(
@@ -205,10 +206,10 @@ class Stringer():
                     self.lcd.LCD_LINE_2)
                 if self.rot.BUTTON_LAST_PRESS != self.button:
                     self.button = self.rot.BUTTON_LAST_PRESS
-                    known_weight = max(0,min(500, self.rot.COUNTER))/10
+                    known_weight = self.rot.COUNTER/10
                     cal_readings.append([known_weight, self.hx.get_reading(n_obs=9, clip=True)])
                     calibration_step = 2
-            while calibration_step == 2:
+            while calibration_step == 2:  # zero weight
                 self.lcd.lcd_string("press when", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("tension is zero", self.lcd.LCD_LINE_2)
                 self.go_home(suppress_message=True)
