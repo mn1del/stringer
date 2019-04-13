@@ -198,8 +198,8 @@ class Stringer():
                     if self.rot.BUTTON_LAST_PRESS != self.button:
                         self.button = self.rot.BUTTON_LAST_PRESS
                         calibration_step = 1
+            self.rot.COUNTER = 200  # 20 kgs starting default
             while calibration_step == 1:  # enter known weight
-                self.rot.COUNTER = 200  # 20 kgs starting default
                 self.lcd.lcd_string("known tension:", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string(
                     "{:,.1f} kgs".format(max(0,min(500, self.rot.COUNTER))/10), 
