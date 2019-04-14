@@ -208,11 +208,11 @@ class Stringer():
                     self.button = self.rot.BUTTON_LAST_PRESS
                     known_weight = self.rot.COUNTER/10
                     cal_readings.append([known_weight, self.hx.get_reading(n_obs=9, clip=True)])
+                    self.go_home(suppress_message=True)
                     calibration_step = 2
             while calibration_step == 2:  # zero weight
                 self.lcd.lcd_string("press when", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("tension is zero", self.lcd.LCD_LINE_2)
-                self.go_home(suppress_message=True)
                 if self.rot.BUTTON_LAST_PRESS != self.button:
                     self.button = self.rot.BUTTON_LAST_PRESS
                     known_weight = 0
