@@ -153,7 +153,7 @@ class Stringer():
                     self.increment_stepper(1, self.movement_mm*10, 5)
                 elif self.current_kgs > self.target_kgs:
                     print("loosen")
-                    self.increment_stepper(-1, self.movement_mm, 2)
+                    self.increment_stepper(-1, self.movement_mm*10, 5)
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:

@@ -1,2 +1,2 @@
-cal_factor = 91038.5
-cal_offset = 135222.4
+cal_factor = 75912.14285714286
+cal_offset = 68081.42857142857
