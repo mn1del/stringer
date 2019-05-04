@@ -28,7 +28,7 @@ class Stringer():
         self.movement_mm = 0.05  # distance to increment the leadscrew
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
-        self.steps_per_rev = 400
+        self.steps_per_rev = 200
         self.hx = HX711(data=27, clock=17, channel="A", gain=128, printout=False)
         self.lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=11, e_pin=5)
         self.rot = RotaryEncoder(
@@ -50,7 +50,7 @@ class Stringer():
                 ms1_pin=20, 
                 ms2_pin=16,
                 steps_per_rev=self.steps_per_rev,
-                microstep_mode=2,
+                microstep_mode=1,
                 driver="drv8825")
 
         # Attempt to read in calibration factors and set mode accordingly
