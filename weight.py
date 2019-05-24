@@ -50,6 +50,8 @@ class Stringer():
                 ms1_pin=20, 
                 ms2_pin=16,
                 steps_per_rev=self.steps_per_rev,
+                acceleration=600,
+                starting_rpm=6,
                 microstep_mode=1,
                 driver="drv8825")
 
@@ -274,16 +276,16 @@ class Stringer():
                      Defaults to self.movement_mm
         mm_per_sec: (int) determines inter step pause length             
         """
-        pause_len = 0.5/(self.steps_per_rev * mm_per_sec/self.leadscrew_lead)
         if movement_mm is None:
             movement_mm = self.movement_mm
+        rpm = 60 * mm_per_sec/self.leadscrew_lead    
         direction = int((direction + 1) / 2)  # convert to 0|1   
         n_steps = int(self.steps_per_rev * movement_mm / self.leadscrew_lead)
         self.stepper.step(
                 n_steps=n_steps,
                 direction=direction,
-                inter_step_pause=pause_len,
-                high_pause=pause_len)
+                rpm=rpm,
+                use_ramp=True)
         self.HOME = False
         
     def limit_switch_triggered(self, limit_switch):
