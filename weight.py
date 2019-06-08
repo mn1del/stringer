@@ -132,7 +132,7 @@ class Stringer():
         Initialize rotary encoder counter with target_kgs and start tensioning logic loop.
         target_kgs can be dynamically managed with the rotary encoder.
         """
-        print("In tensioning mode\ntarget_kgs: {}".format(self.target_kgs))
+        print("In tensioning mode")
         self.rot.COUNTER = self.target_kgs*10
         movement_factor = self.target_kgs*10
         
@@ -154,7 +154,7 @@ class Stringer():
             else:  # tighten/loosen
                 movement_factor = max(2.0, min(movement_factor, abs(self.current_kgs - self.target_kgs)*10))
                 speed = max(movement_factor/25, 0.5)
-                if (self.current_kgs > 22) & (movement_factor<=3) & (self.stepper.MICROSTEP_MODE!=1):
+                if (self.current_kgs > 22) & (movement_factor<=3) & (self.stepper.MICROSTEP_MODE!=2):
                     print("Microstep mode: 2")
                     self.stepper.set_microsteps(mode=2)
                 if self.current_kgs < self.target_kgs:
