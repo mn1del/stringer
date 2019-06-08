@@ -151,7 +151,7 @@ class Stringer():
                 self.go_home()
                 self.MODE = "resting"
             else:  # tighten/loosen
-                movement_factor = max(2, min(movement_factor, abs(self.current_kgs - self.target_kgs)*10))
+                movement_factor = max(2.0, min(movement_factor, abs(self.current_kgs - self.target_kgs)*10))
                 speed = max(movement_factor/25, 0.5)
                 if (self.current_kgs > 22) & (movement_factor<=3) & (self.stepper.MICROSTEP_MODE!=1):
                     print("Microstep mode: Full step")
