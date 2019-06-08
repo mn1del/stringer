@@ -251,10 +251,10 @@ class Stringer():
         # increment backwards until near limit triggered:
         while not (self.limit_switch_triggered(self.near_limit_switch)) \
                 | (self.limit_switch_triggered(self.far_limit_switch)):
-            self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=2.5)
+            self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=5)
             #self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=2.5)
         # finally back off near limit switch     
-        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=2.5)
+        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=5)
         self.HOME = True
         
     def raw_to_kgs(self, raw):
