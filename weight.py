@@ -154,16 +154,16 @@ class Stringer():
             else:  # tighten/loosen
                 movement_factor = max(2.0, min(movement_factor, abs(self.current_kgs - self.target_kgs)*10))
                 speed = max(movement_factor/25, 0.5)
-                if (self.current_kgs > 22) & (movement_factor<=3) & (self.stepper.MICROSTEP_MODE!=2):
-                    print("Microstep mode: 2")
-                    self.stepper.set_microsteps(mode=2)
+                #if (self.current_kgs > 22) & (movement_factor<=3) & (self.stepper.MICROSTEP_MODE!=2):
+                #    print("Microstep mode: 2")
+                #    self.stepper.set_microsteps(mode=2)
                 if self.current_kgs < self.target_kgs:
                     self.increment_stepper(1, 0.05 * movement_factor, mm_per_sec=2.5)
                 elif self.current_kgs > self.target_kgs:
                     self.increment_stepper(-1, 0.05 * movement_factor, mm_per_sec=2.5)
             if self.rot.BUTTON_LAST_PRESS != self.button:
-                print("Microstep mode: {}".format(self.microstep_mode))
-                self.stepper.set_microsteps(mode=self.microstep_mode)
+                #print("Microstep mode: {}".format(self.microstep_mode))
+                #self.stepper.set_microsteps(mode=self.microstep_mode)
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
                     # The stepper remains energized in the current position
