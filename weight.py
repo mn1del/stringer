@@ -53,7 +53,7 @@ class Stringer():
                 steps_per_rev=self.stepper_full_steps_per_rev * self.microstep_mode,
                 acceleration=600,
                 starting_rpm=6,
-                microstep_mode=1,
+                microstep_mode=self.microstep_mode,
                 driver="drv8825")
 
         # Attempt to read in calibration factors and set mode accordingly
