@@ -138,7 +138,8 @@ class Stringer():
         
         while self.MODE == "tensioning":
             self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=3, clip=True))
-            print("Move: {}mm, Kgs: {:,.2f}, target: {:,.2f}".format(self.current_kgs, self.target_kgs))
+            print("Move: {:,.2f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
+                0.05*movement_factor, self.current_kgs, self.target_kgs))
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
