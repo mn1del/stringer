@@ -29,7 +29,7 @@ class Stringer():
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
         self.stepper_full_steps_per_rev = 200
-        self.microstep_mode = 2
+        self.microstep_mode = 1
         self.hx = HX711(data=27, clock=17, channel="A", gain=128, printout=False)
         self.lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=11, e_pin=5)
         self.rot = RotaryEncoder(
@@ -252,7 +252,6 @@ class Stringer():
         while not (self.limit_switch_triggered(self.near_limit_switch)) \
                 | (self.limit_switch_triggered(self.far_limit_switch)):
             self.increment_stepper(direction=-1, movement_mm=1, mm_per_sec=5)
-            #self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=2.5)
         # finally back off near limit switch     
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=5)
         self.HOME = True
