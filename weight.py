@@ -134,6 +134,7 @@ class Stringer():
         """
         print("In tensioning mode\ntarget_kgs: {}".format(self.target_kgs))
         self.rot.COUNTER = self.target_kgs*10
+        movement_factor = self.target_kgs*10
         
         while self.MODE == "tensioning":
             print(self.hx.get_reading(n_obs=3, clip=True))
@@ -151,13 +152,14 @@ class Stringer():
                 self.go_home()
                 self.MODE = "resting"
             else:  # tighten/loosen
-                movement_factor = abs(self.current_kgs - self.target_kgs)*10
+                movement_factor = min(movement_factor, abs(self.current_kgs - self.target_kgs)*10)
+                speed = max(movement_factor/25, 1)
                 if self.current_kgs < self.target_kgs:
                     print("tighten")
-                    self.increment_stepper(1, self.movement_mm * movement_factor, mm_per_sec=2.5)
+                    self.increment_stepper(1, 0.05 * movement_factor, mm_per_sec=2.5)
                 elif self.current_kgs > self.target_kgs:
                     print("loosen")
-                    self.increment_stepper(-1, self.movement_mm * movement_factor, mm_per_sec=2.5)
+                    self.increment_stepper(-1, 0.05 * movement_factor, mm_per_sec=2.5)
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
