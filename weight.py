@@ -152,7 +152,7 @@ class Stringer():
                 self.go_home()
                 self.MODE = "resting"
             else:  # tighten/loosen
-                movement_factor = max(2.0, min(movement_factor*1.1, abs(self.current_kgs - self.target_kgs)*10))
+                movement_factor = max(1.0, min(movement_factor*1.1, abs(self.current_kgs - self.target_kgs)*10))
                 speed = max(movement_factor/25, 0.5)
                 if self.current_kgs < self.target_kgs:
                     self.increment_stepper(1, 0.05 * movement_factor, mm_per_sec=2.5)
