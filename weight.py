@@ -51,7 +51,7 @@ class Stringer():
                 ms1_pin=20, 
                 ms2_pin=16,
                 steps_per_rev=self.stepper_full_steps_per_rev * self.microstep_mode,
-                acceleration=400,
+                acceleration=300,
                 starting_rpm=12,
                 microstep_mode=self.microstep_mode,
                 driver="drv8825")
