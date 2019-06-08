@@ -50,7 +50,7 @@ class Stringer():
                 ms0_pin=21, 
                 ms1_pin=20, 
                 ms2_pin=16,
-                steps_per_rev=self.steps_per_rev & self.microstep_mode,
+                steps_per_rev=self.steps_per_rev * self.microstep_mode,
                 acceleration=600,
                 starting_rpm=6,
                 microstep_mode=1,
