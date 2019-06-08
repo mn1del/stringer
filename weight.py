@@ -29,7 +29,7 @@ class Stringer():
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
         self.stepper_full_steps_per_rev = 200
-        self.microstep_mode = 2 
+        self.microstep_mode = 4 
         self.hx = HX711(data=27, clock=17, channel="A", gain=128, printout=False)
         self.lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=11, e_pin=5)
         self.rot = RotaryEncoder(
@@ -155,8 +155,8 @@ class Stringer():
                 movement_factor = max(2.0, min(movement_factor, abs(self.current_kgs - self.target_kgs)*10))
                 speed = max(movement_factor/25, 0.5)
                 if (self.current_kgs > 22) & (movement_factor<=3) & (self.stepper.MICROSTEP_MODE!=1):
-                    print("Microstep mode: Full step")
-                    self.stepper.set_microsteps(mode=1)
+                    print("Microstep mode: 2")
+                    self.stepper.set_microsteps(mode=2)
                 if self.current_kgs < self.target_kgs:
                     self.increment_stepper(1, 0.05 * movement_factor, mm_per_sec=2.5)
                 elif self.current_kgs > self.target_kgs:
