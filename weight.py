@@ -24,7 +24,7 @@ class Stringer():
         # setup hardware
         GPIO.setmode(GPIO.BCM)
         self.n_obs = 5
-        self.target_kgs = 20.0
+        self.target_kgs = 25.0
         self.movement_mm = 0.05  # distance to increment the leadscrew
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
@@ -151,12 +151,13 @@ class Stringer():
                 self.go_home()
                 self.MODE = "resting"
             else:  # tighten/loosen
+                movement_factor = abs(self.current_kgs - self.target_kgs)*10
                 if self.current_kgs < self.target_kgs:
                     print("tighten")
-                    self.increment_stepper(1, self.movement_mm*20, mm_per_sec=2.5)
+                    self.increment_stepper(1, self.movement_mm * movement_factor, mm_per_sec=2.5)
                 elif self.current_kgs > self.target_kgs:
                     print("loosen")
-                    self.increment_stepper(-1, self.movement_mm*20, mm_per_sec=2.5)
+                    self.increment_stepper(-1, self.movement_mm * movement_factor, mm_per_sec=2.5)
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
