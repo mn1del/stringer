@@ -283,6 +283,7 @@ class Stringer():
         direction = int((direction + 1) / 2)  # convert to 0|1   
         n_steps = int(self.stepper_full_steps_per_rev * self.microstep_mode * movement_mm
                 / self.leadscrew_lead)
+        print("nsteps: {}, with ramp".format(n_steps))
         self.stepper.step(
                 n_steps=n_steps,
                 direction=direction,
