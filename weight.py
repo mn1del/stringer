@@ -138,7 +138,7 @@ class Stringer():
         
         while self.MODE == "tensioning":
             self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=3, clip=True))
-            print("Move: {:,.2f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
+            print("Move: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
                 0.05*movement_factor, self.current_kgs, self.target_kgs))
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
@@ -152,7 +152,7 @@ class Stringer():
                 self.go_home()
                 self.MODE = "resting"
             else:  # tighten/loosen
-                movement_factor = max(1.0, min(movement_factor*1.1, abs(self.current_kgs - self.target_kgs)*10))
+                movement_factor = max(0.5, min(movement_factor*1.1, abs(self.current_kgs - self.target_kgs)*10))
                 speed = max(movement_factor/25, 0.5)
                 if self.current_kgs < self.target_kgs:
                     self.increment_stepper(1, 0.05 * movement_factor, mm_per_sec=2.5)
