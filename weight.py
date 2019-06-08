@@ -138,7 +138,7 @@ class Stringer():
         
         while self.MODE == "tensioning":
             self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=3, clip=True))
-            print("Current Kgs: {:,.2f}, target: {:,.2f}".format(self.current_kgs, self.target_kgs))
+            print("Move: {}mm, Kgs: {:,.2f}, target: {:,.2f}".format(self.current_kgs, self.target_kgs))
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
@@ -151,20 +151,18 @@ class Stringer():
                 self.go_home()
                 self.MODE = "resting"
             else:  # tighten/loosen
-                movement_factor = max(0.1, min(movement_factor, abs(self.current_kgs - self.target_kgs)*10))
-                speed = max(movement_factor/25, 1)
+                movement_factor = max(2, min(movement_factor, abs(self.current_kgs - self.target_kgs)*10))
+                speed = max(movement_factor/25, 0.5)
                 if (self.current_kgs > 22) & (movement_factor<=3) & (self.stepper.MICROSTEP_MODE!=1):
                     print("Microstep mode: Full step")
                     self.stepper.set_microsteps(mode=1)
-                elif self.stepper.MICROSTEP_MODE!=self.microstep_mode:
-                    print("Microstep mode: {}".format(self.microstep_mode))
-                    self.stepper.set_microsteps(mode=self.microstep_mode)
-
                 if self.current_kgs < self.target_kgs:
                     self.increment_stepper(1, 0.05 * movement_factor, mm_per_sec=2.5)
                 elif self.current_kgs > self.target_kgs:
                     self.increment_stepper(-1, 0.05 * movement_factor, mm_per_sec=2.5)
             if self.rot.BUTTON_LAST_PRESS != self.button:
+                print("Microstep mode: {}".format(self.microstep_mode))
+                self.stepper.set_microsteps(mode=self.microstep_mode)
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
                     # The stepper remains energized in the current position
