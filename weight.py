@@ -28,7 +28,7 @@ class Stringer():
         self.movement_mm = 0.05  # distance to increment the leadscrew
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
-        self.steps_per_rev = 200
+        self.stepper_full_steps_per_rev = 200
         self.microstep_mode = 2
         self.hx = HX711(data=27, clock=17, channel="A", gain=128, printout=False)
         self.lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=11, e_pin=5)
@@ -50,7 +50,7 @@ class Stringer():
                 ms0_pin=21, 
                 ms1_pin=20, 
                 ms2_pin=16,
-                steps_per_rev=self.steps_per_rev * self.microstep_mode,
+                steps_per_rev=self.stepper_full_steps_per_rev * self.microstep_mode,
                 acceleration=600,
                 starting_rpm=6,
                 microstep_mode=1,
@@ -281,7 +281,8 @@ class Stringer():
             movement_mm = self.movement_mm
         rpm = 60 * mm_per_sec/self.leadscrew_lead    
         direction = int((direction + 1) / 2)  # convert to 0|1   
-        n_steps = int(self.steps_per_rev * movement_mm / self.leadscrew_lead)
+        n_steps = int(self.stepper_full_steps_per_rev * self.microstep_mode * movement_mm
+                / self.leadscrew_lead)
         self.stepper.step(
                 n_steps=n_steps,
                 direction=direction,
