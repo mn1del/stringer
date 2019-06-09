@@ -26,7 +26,7 @@ class Stringer():
         self.n_obs = 5
         self.target_kgs = 25.0
         self.stall_safe_kgs = 20  # only increment safe fast retract distance if the weight is less than this
-        self.fast_retract_mm = 0  # safe distance to travel when going home (function of speed and weight)
+        self.FAST_RETRACT_MM = 0  # safe distance to travel when going home (function of speed and weight)
         self.movement_mm = 0.05  # distance to increment the leadscrew
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
@@ -58,6 +58,8 @@ class Stringer():
                 starting_rpm=6,
                 microstep_mode=self.microstep_mode,
                 driver="drv8825")
+        self.NEAR_LIMIT_TRIGGERED = False
+        self.FAR_LIMIT_TRIGGERED = False
 
         # Attempt to read in calibration factors and set mode accordingly
         try:
@@ -80,6 +82,12 @@ class Stringer():
         Start the logic loop
         """
         try:
+            # start threads:
+            self.RUN_THREADS = True
+            limit_thread = threading.Thread(target=self.monitor_limit_switches)
+            limit_thread.start()
+            kgs_thread = threading.Thread(target=self.monitor_current_kgs)
+            kgs_thread.start()
             # go to the home location of the tensioner
             self.go_home() 
             while True:
@@ -93,11 +101,13 @@ class Stringer():
                     print("Unknown mode!")
         except:
             # code to cleanup here
+            self.RUN_THREADS = False
             self.stepper.sleep()
             self.lcd.clear_screen()
             print("Something went wrong in the master loop")
             pass
         finally:
+            self.RUN_THREADS = False
             self.stepper.sleep()
             self.lcd.clear_screen()
             GPIO.cleanup()
@@ -138,42 +148,31 @@ class Stringer():
         """
         print("In tensioning mode")
         self.rot.COUNTER = self.target_kgs*10
-        movement_factor = self.target_kgs*10
-        movement = 0
         cumulative_movement = 0
+        # start tensioning lcd thread
+        tensioning_lcd_thread = threading.Thread(target=self.tensioning_helper_thread)
+        tensioning_lcd_thread.start()
         
         while self.MODE == "tensioning":
-            self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=3, clip=True))
             print("Move: {:,.3f}mm, Cumulative movement: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
-                movement, cumulative_movement, self.current_kgs, self.target_kgs))
-            self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
-            self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
-            self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
+                self.MOVEMENT, cumulative_movement, self.CURRENT_KGS, self.target_kgs))
 
-            if (self.limit_switch_triggered(self.near_limit_switch)) \
-                    | (self.limit_switch_triggered(self.far_limit_switch)):
+            if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
+                self.MODE = "resting"
                 self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
                 time.sleep(0.5)
                 self.go_home()
-                self.MODE = "resting"
             else:  # tighten/loosen
-                movement_factor = max(0.5, min(movement_factor*1.2, abs(self.current_kgs - self.target_kgs)*10))
-                speed = max(movement_factor/25, 0.5)
-                if self.current_kgs < self.target_kgs:
-                    if self.current_kgs >= 23:
-                        movement = min(0.5, 0.05 * movement_factor)
-                    else:    
-                        movement = 0.1 * movement_factor
-                    cumulative_movement += movement
-                    if (self.current_kgs <= self.stall_safe_kgs):
-                        self.fast_retract_mm += movement
-                    self.increment_stepper(1, movement, mm_per_sec=4)
-                elif self.current_kgs > self.target_kgs:
-                    movement = -0.05 * movement_factor
-                    cumulative_movement += movement
-                    self.fast_retract_mm += movement
-                    self.increment_stepper(-1, movement, mm_per_sec=4)
+                if self.CURRENT_KGS < self.target_kgs:
+                    cumulative_movement += self.MOVEMENT
+                    if (self.CURRENT_KGS <= self.stall_safe_kgs):
+                        self.FAST_RETRACT_MM += self.MOVEMENT
+                    self.increment_stepper(1, self.MOVEMENT, mm_per_sec=4)
+                elif self.CURRENT_KGS > self.target_kgs:
+                    cumulative_movement += self.MOVEMENT
+                    self.FAST_RETRACT_MM += self.MOVEMENT
+                    self.increment_stepper(-1, self.MOVEMENT, mm_per_sec=4)
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
@@ -259,19 +258,18 @@ class Stringer():
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
         # initial back off from far limit switch:
-        if self.limit_switch_triggered(self.far_limit_switch):
-            self.increment_stepper(direction=-1, movement_mm=self.limit_backoff_mm, mm_per_sec=10)
+        if self.FAR_LIMIT_TRIGGERED:
+            self.increment_stepper(direction=-1, movement_mm=self.limit_backoff_mm, mm_per_sec=5)
         # Display status
         if not suppress_message:
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # initial fast retract
-        self.increment_stepper(direction=-1, movement_mm=self.fast_retract_mm, mm_per_sec=5)
-        self.fast_retract_mm = 0
+        self.increment_stepper(direction=-1, movement_mm=self.FAST_RETRACT_MM, mm_per_sec=5)
+        self.FAST_RETRACT_MM = 0
         # increment backwards until near limit triggered:
-        while not (self.limit_switch_triggered(self.near_limit_switch)) \
-                | (self.limit_switch_triggered(self.far_limit_switch)):
-            self.increment_stepper(direction=-1, movement_mm=1, mm_per_sec=6)
+        while not self.NEAR_LIMIT_TRIGGERED:
+            self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=5)
         # finally back off near limit switch     
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=6)
         self.HOME = True
@@ -286,10 +284,11 @@ class Stringer():
         kgs = max(0,(raw - self.cal_offset) / self.cal_factor)
         return kgs
     
-    def increment_stepper(self, direction, movement_mm=None, mm_per_sec=5):
+    def increment_stepper(self, direction, movement_mm, mm_per_sec=5):
         """
         Helper function to increment the leadscrew forwards.
         Sets HOME to False, to register that the position has changed.
+        Also has safety logic to check against the limit switches.
         
         args:
         direction: (int) 1 or -1. 1 for tightening motion. -1 for loosening
@@ -297,19 +296,24 @@ class Stringer():
                      Defaults to self.movement_mm
         mm_per_sec: (int) determines inter step pause length             
         """
-        if movement_mm is None:
-            movement_mm = self.movement_mm
         rpm = 60 * mm_per_sec/self.leadscrew_lead    
         direction = int((direction + 1) / 2)  # convert to 0|1   
         n_steps = int(self.stepper_full_steps_per_rev * self.microstep_mode * movement_mm
                 / self.leadscrew_lead)
-        self.stepper.step(
-                n_steps=n_steps,
-                direction=direction,
-                rpm=rpm,
-                use_ramp=True)
+        if (direction==1) & (self.FAR_LIMIT_TRIGGERED==False):
+            self.stepper.step(
+                    n_steps=n_steps,
+                    direction=direction,
+                    rpm=rpm,
+                    use_ramp=True)
+        elif (direction==0) & (self.NEAR_LIMIT_TRIGGERED==False):
+            self.stepper.step(
+                    n_steps=n_steps,
+                    direction=direction,
+                    rpm=rpm,
+                    use_ramp=True)
         self.HOME = False
-        
+
     def limit_switch_triggered(self, limit_switch):
         """
         Returns boolean indicating whether limit switch has been triggered.
@@ -327,6 +331,54 @@ class Stringer():
             # Unbroken normally closed loop pulling the pin to ground (i.e. LOW)
             triggered = False
         return triggered          
+        
+    def monitor_limit_switches(self):
+        """
+        Constantly monitors the state of the limit switches. Sets the 
+        state of self.NEAR_LIMIT_TRIGGERED and self.FAR_LIMIT_TRIGGERED accordingly
+        """
+        while self.RUN_THREADS:
+            if self.limit_switch_triggered(self.near_limit_switch):
+                self.NEAR_LIMIT_TRIGGERED = True
+            else:    
+                self.NEAR_LIMIT_TRIGGERED = False
+            if self.limit_switch_triggered(self.far_limit_switch):
+                self.FAR_LIMIT_TRIGGERED = True
+            else:    
+                self.FAR_LIMIT_TRIGGERED = False
+
+    def monitor_current_kgs(self):
+        """
+        Constantly monitors the HX711 reading and stores the converted state in self.CURRENT_KGS.
+        """
+        while self.RUN_THREADS:
+            raw = self.hx.get_reading(n_obs=3, clip=True)
+            kgs = max(0,(raw - self.cal_offset) / self.cal_factor)
+            self.CURRENT_KGS = kgs
+
+    def calc_tensioning_movement(self):
+        """
+        Constantly calculates next movement_mm, depending on self.MODE, self.CURRENT_KGS, and self.target_kgs.
+        Runs in its own thread to reduce latency between stepper motor commands.
+        """
+        movement_factor = 10 * self.target_kgs
+        while self.RUN_THREADS:
+            movement_factor = max(0.5, min(movement_factor*1.2, abs(self.CURRENT_KGS - self.target_kgs)*10))
+            if self.CURRENT_KGS >= 22:
+                movement = min(0.5, 0.05 * movement_factor)
+            else:    
+                movement = 0.1 * movement_factor
+            self.MOVEMENT = movement    
+
+    def tensioning_helper_thread(self):
+        """
+        Designed to dynamically display tension data in a separate thread while the motor runs in the main
+        thread. 
+        """
+        while (self.RUN_THREADS) & (self.MODE == "tensioning"):
+            self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
+            self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
+            self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.CURRENT_KGS), self.lcd.LCD_LINE_2)
         
 if __name__ == "__main__":
     stringer = Stringer()
