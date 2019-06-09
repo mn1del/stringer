@@ -385,9 +385,9 @@ class Stringer():
         """
         while (self.RUN_THREADS) & (self.MODE == "tensioning"):
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
-            print("Got here\nCURRENT_KGS: {}, target_kgs: {}".format(self.CURRENT_KGS, self.target_kgs))
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.CURRENT_KGS), self.lcd.LCD_LINE_2)
+            print("Got here!!!")
         
 if __name__ == "__main__":
     stringer = Stringer()
