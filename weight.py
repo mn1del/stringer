@@ -161,7 +161,7 @@ class Stringer():
                 movement_factor = max(0.5, min(movement_factor*1.2, abs(self.current_kgs - self.target_kgs)*10))
                 speed = max(movement_factor/25, 0.5)
                 if self.current_kgs < self.target_kgs:
-                    movement = 0.05 * movement_factor
+                    movement = 0.1 * movement_factor
                     cumulative_movement += movement
                     if (self.current_kgs <= self.stall_safe_kgs):
                         self.fast_retract_mm += movement
