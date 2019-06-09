@@ -301,19 +301,14 @@ class Stringer():
         direction = int((direction + 1) / 2)  # convert to 0|1   
         n_steps = int(self.stepper_full_steps_per_rev * self.microstep_mode * movement_mm
                 / self.leadscrew_lead)
-#        if (direction==1) & (self.FAR_LIMIT_TRIGGERED==False):
-#            self.stepper.step(
-#                    n_steps=n_steps,
-#                    direction=direction,
-#                    rpm=rpm,
-#                    use_ramp=True)
-#        elif (direction==0) & (self.NEAR_LIMIT_TRIGGERED==False):
-#            self.stepper.step(
-#                    n_steps=n_steps,
-#                    direction=direction,
-#                    rpm=rpm,
-#                    use_ramp=True)
-        self.stepper.step(
+        if (direction==1) & (self.FAR_LIMIT_TRIGGERED==False):
+            self.stepper.step(
+                    n_steps=n_steps,
+                    direction=direction,
+                    rpm=rpm,
+                    use_ramp=True)
+        elif (direction==0) & (self.NEAR_LIMIT_TRIGGERED==False):
+            self.stepper.step(
                     n_steps=n_steps,
                     direction=direction,
                     rpm=rpm,
