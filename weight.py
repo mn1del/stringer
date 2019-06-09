@@ -344,6 +344,7 @@ class Stringer():
         state of self.NEAR_LIMIT_TRIGGERED and self.FAR_LIMIT_TRIGGERED accordingly
         """
         while self.RUN_THREADS:
+            time.sleep(0.005)
             if self.limit_switch_triggered(self.near_limit_switch):
                 self.NEAR_LIMIT_TRIGGERED = True
             else:    
@@ -358,6 +359,7 @@ class Stringer():
         Constantly monitors the HX711 reading and stores the converted state in self.CURRENT_KGS.
         """
         while self.RUN_THREADS:
+            time.sleep(0.005)
             raw = self.hx.get_reading(n_obs=3, clip=True)
             kgs = max(0,(raw - self.cal_offset) / self.cal_factor)
             self.CURRENT_KGS = kgs
