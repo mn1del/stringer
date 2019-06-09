@@ -165,12 +165,12 @@ class Stringer():
                     cumulative_movement += movement
                     if (self.current_kgs <= self.stall_safe_kgs):
                         self.fast_retract_mm += movement
-                    self.increment_stepper(1, movement, mm_per_sec=5)
+                    self.increment_stepper(1, movement, mm_per_sec=4)
                 elif self.current_kgs > self.target_kgs:
                     movement = -0.05 * movement_factor
                     cumulative_movement += movement
                     self.fast_retract_mm += movement
-                    self.increment_stepper(-1, movement, mm_per_sec=5)
+                    self.increment_stepper(-1, movement, mm_per_sec=4)
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
