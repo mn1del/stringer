@@ -258,7 +258,6 @@ class Stringer():
                                    Default zero results in no initial far limit backoff
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
-        print("far limit: {}\nnear limit: {}".format(self.FAR_LIMIT_TRIGGERED, self.NEAR_LIMIT_TRIGGERED))
         # initial back off from far limit switch:
         if self.FAR_LIMIT_TRIGGERED:
             self.increment_stepper(direction=-1, movement_mm=self.limit_backoff_mm, mm_per_sec=5)
@@ -273,7 +272,6 @@ class Stringer():
         while not self.NEAR_LIMIT_TRIGGERED:
             self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=5)
         # finally back off near limit switch     
-        print("HERE!")
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=6)
         self.HOME = True
         
@@ -385,9 +383,9 @@ class Stringer():
         Designed to dynamically display tension data in a separate thread while the motor runs in the main
         thread. 
         """
-        print("Got here")
         while (self.RUN_THREADS) & (self.MODE == "tensioning"):
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
+            print("Got here\nCURRENT_KGS: {}, target_kgs: {}".format(self.CURRENT_KGS, self.target_kgs))
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.CURRENT_KGS), self.lcd.LCD_LINE_2)
         
