@@ -272,6 +272,7 @@ class Stringer():
         while not self.NEAR_LIMIT_TRIGGERED:
             self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=5)
         # finally back off near limit switch     
+        print("HERE!")
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=6)
         self.HOME = True
         
