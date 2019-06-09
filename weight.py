@@ -162,7 +162,7 @@ class Stringer():
                 speed = max(movement_factor/25, 0.5)
                 if self.current_kgs < self.target_kgs:
                     if self.current_kgs >= 23:
-                        movement = min(0.75, 0.1 * movement_factor)
+                        movement = min(0.5, 0.05 * movement_factor)
                     else:    
                         movement = 0.1 * movement_factor
                     cumulative_movement += movement
