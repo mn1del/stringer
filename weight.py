@@ -150,7 +150,9 @@ class Stringer():
         print("In tensioning mode")
         self.rot.COUNTER = self.target_kgs*10
         cumulative_movement = 0
-        # start tensioning lcd thread
+        # start supplementary threads
+        movement_thread = threading.Thread(target=self.calc_tensioning_movement)
+        movement_thread.start()
         tensioning_lcd_thread = threading.Thread(target=self.tensioning_helper_thread)
         tensioning_lcd_thread.start()
         
@@ -375,6 +377,7 @@ class Stringer():
             else:    
                 movement = 0.1 * movement_factor
             self.MOVEMENT = movement    
+            time.sleep(0.1)
 
     def tensioning_helper_thread(self):
         """
