@@ -258,6 +258,7 @@ class Stringer():
                                    Default zero results in no initial far limit backoff
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
+        print("far limit: {}\nnear limit: {}".format(self.FAR_LIMIT_TRIGGERED, self.NEAR_LIMIT_TRIGGERED))
         # initial back off from far limit switch:
         if self.FAR_LIMIT_TRIGGERED:
             self.increment_stepper(direction=-1, movement_mm=self.limit_backoff_mm, mm_per_sec=5)
