@@ -25,7 +25,7 @@ class Stringer():
         GPIO.setmode(GPIO.BCM)
         self.n_obs = 5
         self.target_kgs = 25.0
-        self.stall_safe_kgs = 18  # only increment safe fast retract distance if the weight is less than this
+        self.stall_safe_kgs = 20  # only increment safe fast retract distance if the weight is less than this
         self.fast_retract_mm = 0  # safe distance to travel when going home (function of speed and weight)
         self.movement_mm = 0.05  # distance to increment the leadscrew
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
