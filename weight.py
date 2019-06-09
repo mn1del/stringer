@@ -25,6 +25,8 @@ class Stringer():
         GPIO.setmode(GPIO.BCM)
         self.n_obs = 5
         self.target_kgs = 25.0
+        self.stall_safe_kgs  # only increment safe fast retract distance if the weight is less than this
+        self.fast_retract_mm = 0  # safe distance to travel when going home (function of speed and weight)
         self.movement_mm = 0.05  # distance to increment the leadscrew
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
@@ -137,11 +139,13 @@ class Stringer():
         print("In tensioning mode")
         self.rot.COUNTER = self.target_kgs*10
         movement_factor = self.target_kgs*10
+        movement = 0
+        cumulative_movement = 0
         
         while self.MODE == "tensioning":
             self.current_kgs = self.raw_to_kgs(self.hx.get_reading(n_obs=3, clip=True))
-            print("Move: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
-                0.05*movement_factor, self.current_kgs, self.target_kgs))
+            print("Move: {:,.3f}mm, Cumulative movement: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
+                movement, cumulative_movement self.current_kgs, self.target_kgs))
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.current_kgs), self.lcd.LCD_LINE_2)
@@ -157,9 +161,15 @@ class Stringer():
                 movement_factor = max(0.5, min(movement_factor*1.2, abs(self.current_kgs - self.target_kgs)*10))
                 speed = max(movement_factor/25, 0.5)
                 if self.current_kgs < self.target_kgs:
-                    self.increment_stepper(1, 0.05 * movement_factor, mm_per_sec=2.5)
+                    movement = 0.05 * movement_factor
+                    cumulative_movement += movement
+                    if self.current_kgs <= self.stall_safe_kgs
+                        self.fast_retract_mm += movement
+                    self.increment_stepper(1, movement, mm_per_sec=2.5)
                 elif self.current_kgs > self.target_kgs:
-                    self.increment_stepper(-1, 0.05 * movement_factor, mm_per_sec=2.5)
+                    movement = -0.05 * movement_factor
+                    cumulative_movement += movement
+                    self.increment_stepper(-1, movement, mm_per_sec=2.5)
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
@@ -251,6 +261,9 @@ class Stringer():
         if not suppress_message:
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
+        # initial fast retract
+        self.increment_stepper(direction=-1, movement_mm=self.fast_retract_mm, mm_per_sec=5)
+        self.fast_retract_mm = 0
         # increment backwards until near limit triggered:
         while not (self.limit_switch_triggered(self.near_limit_switch)) \
                 | (self.limit_switch_triggered(self.far_limit_switch)):
