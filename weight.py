@@ -5,6 +5,7 @@ import sys
 import os
 import time
 import RPi.GPIO as GPIO
+from multiprocessing.dummy import threading
 
 sys.path.append(os.path.abspath(os.path.join("..")))
 from rpigpio import HX711
