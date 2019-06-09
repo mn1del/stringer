@@ -32,7 +32,7 @@ class Stringer():
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
         self.stepper_full_steps_per_rev = 200
-        self.microstep_mode = 2 
+        self.microstep_mode = 4 
         self.acceleration = 300
         self.hx = HX711(data=27, clock=17, channel="A", gain=128, printout=False)
         self.lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=11, e_pin=5)
