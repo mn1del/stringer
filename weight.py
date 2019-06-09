@@ -385,6 +385,7 @@ class Stringer():
         Designed to dynamically display tension data in a separate thread while the motor runs in the main
         thread. 
         """
+        print("Got here")
         while (self.RUN_THREADS) & (self.MODE == "tensioning"):
             self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
