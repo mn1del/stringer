@@ -88,7 +88,7 @@ class Stringer():
             limit_thread = threading.Thread(target=self.monitor_limit_switches)
             limit_thread.start()
             kgs_thread = threading.Thread(target=self.monitor_current_kgs)
-            #kgs_thread.start()
+            kgs_thread.start()
             # go to the home location of the tensioner
             self.go_home() 
             while True:
@@ -361,7 +361,7 @@ class Stringer():
         Constantly monitors the HX711 reading and stores the converted state in self.CURRENT_KGS.
         """
         while self.RUN_THREADS:
-            time.sleep(0.005)
+            time.sleep(0.1)
             raw = self.hx.get_reading(n_obs=3, clip=True)
             kgs = max(0,(raw - self.cal_offset) / self.cal_factor)
             self.CURRENT_KGS = kgs
