@@ -263,7 +263,7 @@ class Stringer():
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # initial fast retract
-        self.increment_stepper(direction=-1, movement_mm=self.fast_retract_mm, mm_per_sec=6)
+        self.increment_stepper(direction=-1, movement_mm=self.fast_retract_mm, mm_per_sec=5)
         self.fast_retract_mm = 0
         # increment backwards until near limit triggered:
         while not (self.limit_switch_triggered(self.near_limit_switch)) \
