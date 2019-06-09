@@ -165,12 +165,12 @@ class Stringer():
                     cumulative_movement += movement
                     if (self.current_kgs <= self.stall_safe_kgs):
                         self.fast_retract_mm += movement
-                    self.increment_stepper(1, movement, mm_per_sec=2.5)
+                    self.increment_stepper(1, movement, mm_per_sec=5)
                 elif self.current_kgs > self.target_kgs:
                     movement = -0.05 * movement_factor
                     cumulative_movement += movement
                     self.fast_retract_mm += movement
-                    self.increment_stepper(-1, movement, mm_per_sec=2.5)
+                    self.increment_stepper(-1, movement, mm_per_sec=5)
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
@@ -263,14 +263,14 @@ class Stringer():
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # initial fast retract
-        self.increment_stepper(direction=-1, movement_mm=self.fast_retract_mm, mm_per_sec=6.5)
+        self.increment_stepper(direction=-1, movement_mm=self.fast_retract_mm, mm_per_sec=6)
         self.fast_retract_mm = 0
         # increment backwards until near limit triggered:
         while not (self.limit_switch_triggered(self.near_limit_switch)) \
                 | (self.limit_switch_triggered(self.far_limit_switch)):
-            self.increment_stepper(direction=-1, movement_mm=1, mm_per_sec=5)
+            self.increment_stepper(direction=-1, movement_mm=1, mm_per_sec=6)
         # finally back off near limit switch     
-        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=5)
+        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=6)
         self.HOME = True
         
     def raw_to_kgs(self, raw):
