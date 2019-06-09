@@ -30,6 +30,7 @@ class Stringer():
         self.leadscrew_lead = 2
         self.stepper_full_steps_per_rev = 200
         self.microstep_mode = 4 
+        self.acceleration = 300
         self.hx = HX711(data=27, clock=17, channel="A", gain=128, printout=False)
         self.lcd = LCD1602(data_pins=[6,13,19,26], rs_pin=11, e_pin=5)
         self.rot = RotaryEncoder(
@@ -51,8 +52,8 @@ class Stringer():
                 ms1_pin=20, 
                 ms2_pin=16,
                 steps_per_rev=self.stepper_full_steps_per_rev * self.microstep_mode,
-                acceleration=300,
-                starting_rpm=12,
+                acceleration=self.acceleration,
+                starting_rpm=6,
                 microstep_mode=self.microstep_mode,
                 driver="drv8825")
 
@@ -90,12 +91,13 @@ class Stringer():
                     print("Unknown mode!")
         except:
             # code to cleanup here
+            self.stepper.sleep()
+            lcd.clear_screen()
             print("Something went wrong in the master loop")
             pass
         finally:
             self.stepper.sleep()
-            self.lcd.cleanup()
-            self.hx.cleanup()
+            self.lcd.clear_screen()
             GPIO.cleanup()
                    
     def rest(self):
