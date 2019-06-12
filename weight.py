@@ -62,6 +62,7 @@ class Stringer():
                 driver="drv8825")
         self.NEAR_LIMIT_TRIGGERED = False
         self.FAR_LIMIT_TRIGGERED = False
+        self.BUTTON_PRESSED = False
 
         # Attempt to read in calibration factors and set mode accordingly
         try:
