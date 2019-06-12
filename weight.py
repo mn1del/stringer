@@ -6,6 +6,7 @@ import os
 import time
 import RPi.GPIO as GPIO
 from multiprocessing.dummy import threading
+import traceback
 
 sys.path.append(os.path.abspath(os.path.join("..")))
 from rpigpio import HX711
@@ -100,12 +101,13 @@ class Stringer():
                     self.calibrate()
                 else:
                     print("Unknown mode!")
-        except:
+        except Exception:
             # code to cleanup here
             self.RUN_THREADS = False
             self.stepper.sleep()
             self.lcd.clear_screen()
             print("Something went wrong in the master loop")
+            traceback.print_exc()
             pass
         finally:
             self.RUN_THREADS = False
