@@ -394,6 +394,7 @@ class Stringer():
                 else:
                     self.go_home()
                     self.MODE = "resting"
+            time.sleep(0.2)        
 
 
     def tensioning_helper_thread(self):
