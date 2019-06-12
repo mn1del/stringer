@@ -166,7 +166,7 @@ class Stringer():
             print("Move: {:,.3f}mm, Cumulative movement: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
                 self.MOVEMENT, cumulative_movement, self.CURRENT_KGS, self.TARGET_KGS))
 
-            if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
+            if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED | self.BUTTON_PRESSED:
                 self.MODE = "resting"
                 self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
@@ -179,14 +179,14 @@ class Stringer():
                 elif self.CURRENT_KGS > self.TARGET_KGS:
                     #cumulative_movement += self.MOVEMENT
                     self.increment_stepper(-1, self.MAX_MOVEMENT_MM, mm_per_sec=4)
-#            if self.rot.BUTTON_LAST_PRESS != self.button:
-#                self.button = self.rot.BUTTON_LAST_PRESS
-#                if self.rot.BUTTON_LONG_PRESS:
-#                    # The stepper remains energized in the current position
-#                    self.MODE = "calibrating"
-#                else:
-#                    self.go_home()
-#                    self.MODE = "resting"
+            if self.rot.BUTTON_LAST_PRESS != self.button:
+                self.button = self.rot.BUTTON_LAST_PRESS
+                if self.rot.BUTTON_LONG_PRESS:
+                    # The stepper remains energized in the current position
+                    self.MODE = "calibrating"
+                else:
+                    self.go_home()
+                    self.MODE = "resting"
 
     def calibrate(self):
         """
@@ -386,14 +386,14 @@ class Stringer():
         """
         while (self.RUN_THREADS) & (self.MODE == "tensioning"):
             if self.rot.BUTTON_LAST_PRESS != self.button:
-                self.button = self.rot.BUTTON_LAST_PRESS
+                #self.button = self.rot.BUTTON_LAST_PRESS
                 self.BUTTON_PRESSED = True
-                if self.rot.BUTTON_LONG_PRESS:
+                #if self.rot.BUTTON_LONG_PRESS:
                     # The stepper remains energized in the current position
-                    self.MODE = "calibrating"
-                else:
-                    self.go_home()
-                    self.MODE = "resting"
+                #    self.MODE = "calibrating"
+                #else:
+                #    self.go_home()
+                #    self.MODE = "resting"
             time.sleep(0.2)        
 
 
