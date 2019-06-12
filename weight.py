@@ -403,13 +403,12 @@ class Stringer():
                 #    self.MODE = "resting"
             time.sleep(0.2)        
 
-
     def tensioning_helper_thread(self):
         """
         Designed to dynamically display tension data in a separate thread while the motor runs in the main
         thread. 
         """
-        while (self.RUN_THREADS) & (self.MODE == "tensioning"):
+        while (self.RUN_THREADS) & bool(self.MODE == "tensioning"):
             self.TARGET_KGS = max(0,min(500, self.rot.COUNTER))/10
             self.lcd.lcd_string("Target: {:,.1f} kg".format(self.TARGET_KGS), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.CURRENT_KGS), self.lcd.LCD_LINE_2)
