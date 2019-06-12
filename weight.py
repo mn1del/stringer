@@ -288,7 +288,7 @@ class Stringer():
         Monitors NEAR_LIMIT_TRIGGERED when stepping backwards
         Returns True if safe to continue stepping, else False.
         """
-        return not self.NEAR_LIMIT_TRIGGERED | self.BUTTON_PRESSED
+        return not (self.NEAR_LIMIT_TRIGGERED | self.BUTTON_PRESSED)
     
     def continue_stepping_dir1(self):
         """
@@ -384,15 +384,16 @@ class Stringer():
         Runs in a separate thread during tensioning to update self.button and self.TARGET_KGS
         based on self.rot.BUTTON_LAST_PRESS and self.rot.COUNTER
         """
-        if self.rot.BUTTON_LAST_PRESS != self.button:
-            self.button = self.rot.BUTTON_LAST_PRESS
-            self.BUTTON_PRESSED = True
-            if self.rot.BUTTON_LONG_PRESS:
-                # The stepper remains energized in the current position
-                self.MODE = "calibrating"
-            else:
-                self.go_home()
-                self.MODE = "resting"
+        while (self.RUN_THREADS) & (self.MODE == "tensioning"):
+            if self.rot.BUTTON_LAST_PRESS != self.button:
+                self.button = self.rot.BUTTON_LAST_PRESS
+                self.BUTTON_PRESSED = True
+                if self.rot.BUTTON_LONG_PRESS:
+                    # The stepper remains energized in the current position
+                    self.MODE = "calibrating"
+                else:
+                    self.go_home()
+                    self.MODE = "resting"
 
 
     def tensioning_helper_thread(self):
