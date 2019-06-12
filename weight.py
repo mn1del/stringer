@@ -286,7 +286,22 @@ class Stringer():
         """
         kgs = max(0,(raw - self.cal_offset) / self.cal_factor)
         return kgs
+
+    def continue_stepping_dir0(self):
+        """
+        Monitors NEAR_LIMIT_TRIGGERED when stepping backwards
+        Returns True if safe to continue stepping, else False.
+        """
+        return not self.NEAR_LIMIT_TRIGGERED
     
+    def continue_stepping_dir1(self):
+        """
+        Monitors FAR_LIMIT_TRIGGERED, and CURRENT_KGS vs target_kgs when stepping forwards
+        Returns True if safe to continue stepping, else False.
+        """
+        return not (self.FAR_LIMIT_TRIGGERED | bool(self.CURRENT_KGS > self.target_kgs))
+
+
     def increment_stepper(self, direction, movement_mm, mm_per_sec=5):
         """
         Helper function to increment the leadscrew forwards.
@@ -303,18 +318,25 @@ class Stringer():
         direction = int((direction + 1) / 2)  # convert to 0|1   
         n_steps = int(self.stepper_full_steps_per_rev * self.microstep_mode * movement_mm
                 / self.leadscrew_lead)
-        if (direction==1) & (self.FAR_LIMIT_TRIGGERED==False):
-            self.stepper.step(
-                    n_steps=n_steps,
-                    direction=direction,
-                    rpm=rpm,
-                    use_ramp=True)
-        elif (direction==0) & (self.NEAR_LIMIT_TRIGGERED==False):
-            self.stepper.step(
-                    n_steps=n_steps,
-                    direction=direction,
-                    rpm=rpm,
-                    use_ramp=True)
+        continue_funcs = [self.continue_stepping_dir0, self.continue_stepping_dir1]
+        self.stepper.step(
+                n_steps=n_steps,
+                direction=direction,
+                rpm=rpm,
+                use_ramp=True,
+                continue_func=continue_funcs[direction])
+#        if (direction==1) & (self.FAR_LIMIT_TRIGGERED==False):
+#            self.stepper.step(
+#                    n_steps=n_steps,
+#                    direction=direction,
+#                    rpm=rpm,
+#                    use_ramp=True)
+#        elif (direction==0) & (self.NEAR_LIMIT_TRIGGERED==False):
+#            self.stepper.step(
+#                    n_steps=n_steps,
+#                    direction=direction,
+#                    rpm=rpm,
+#                    use_ramp=True)
         self.HOME = False
 
     def limit_switch_triggered(self, limit_switch):
