@@ -152,6 +152,8 @@ class Stringer():
         self.rot.COUNTER = self.TARGET_KGS*10
         cumulative_movement = 0
         # start supplementary threads
+        button_thread = threading.Thread(target=self.monitor_tensioning_button)
+        button_thread.start()
         movement_thread = threading.Thread(target=self.calc_tensioning_movement)
         movement_thread.start()
         tensioning_lcd_thread = threading.Thread(target=self.tensioning_helper_thread)
