@@ -132,7 +132,7 @@ class Stringer():
         self.stepper.sleep()
         
         # start loop
-        while self.MODE == "resting":
+        while bool(self.MODE == "resting"):
             # control target_kgs with the rotary encoder
             self.TARGET_KGS = self.rot.COUNTER/10
             # display target_kgs
@@ -163,7 +163,7 @@ class Stringer():
         tensioning_lcd_thread = threading.Thread(target=self.tensioning_helper_thread)
         tensioning_lcd_thread.start()
         
-        while self.MODE == "tensioning":
+        while bool(self.MODE == "tensioning"):
             print("Move: {:,.3f}mm, Cumulative movement: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
                 self.MOVEMENT, cumulative_movement, self.CURRENT_KGS, self.TARGET_KGS))
 
@@ -207,8 +207,8 @@ class Stringer():
         counter = self.rot.COUNTER  # get initial rotary encoder COUNTER value
         cal_readings = []  # to be populated with len==2 list of [known_weight, raw_reading] 
         
-        while self.MODE == "calibrating":
-            while calibration_step == 0:  # Control tension directly
+        while bool(self.MODE == "calibrating"):
+            while bool(calibration_step == 0):  # Control tension directly
                 self.lcd.lcd_string("turn to tension", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("and press", self.lcd.LCD_LINE_2)
                 if (self.limit_switch_triggered(self.near_limit_switch)) \
@@ -230,7 +230,7 @@ class Stringer():
                         self.button = self.rot.BUTTON_LAST_PRESS
                         calibration_step = 1
             self.rot.COUNTER = 200  # 20 kgs starting default
-            while calibration_step == 1:  # enter known weight
+            while bool(calibration_step == 1):  # enter known weight
                 self.lcd.lcd_string("known tension:", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string(
                     "{:,.1f} kgs".format(max(0,min(500, self.rot.COUNTER))/10), 
@@ -241,7 +241,7 @@ class Stringer():
                     cal_readings.append([known_weight, self.hx.get_reading(n_obs=9, clip=True)])
                     self.go_home(suppress_message=True)
                     calibration_step = 2
-            while calibration_step == 2:  # zero weight
+            while bool(calibration_step == 2):  # zero weight
                 self.lcd.lcd_string("press when", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("tension is zero", self.lcd.LCD_LINE_2)
                 if self.rot.BUTTON_LAST_PRESS != self.button:
@@ -391,7 +391,7 @@ class Stringer():
         Runs in a separate thread during tensioning to update self.button and self.TARGET_KGS
         based on self.rot.BUTTON_LAST_PRESS and self.rot.COUNTER
         """
-        while (self.RUN_THREADS) & (self.MODE == "tensioning"):
+        while (self.RUN_THREADS) & bool(self.MODE == "tensioning"):
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 #self.button = self.rot.BUTTON_LAST_PRESS
                 self.BUTTON_PRESSED = True
