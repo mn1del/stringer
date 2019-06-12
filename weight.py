@@ -29,6 +29,7 @@ class Stringer():
         self.stall_safe_kgs = 20  # only increment safe fast retract distance if the weight is less than this
         self.FAST_RETRACT_MM = 0  # safe distance to travel when going home (function of speed and weight)
         self.movement_mm = 0.05  # distance to increment the leadscrew
+        self.max_movement_mm = 100
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
         self.stepper_full_steps_per_rev = 200
@@ -261,18 +262,19 @@ class Stringer():
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
         # initial back off from far limit switch:
-        if self.FAR_LIMIT_TRIGGERED:
-            self.increment_stepper(direction=-1, movement_mm=self.limit_backoff_mm, mm_per_sec=5)
+        #if self.FAR_LIMIT_TRIGGERED:
+        #    self.increment_stepper(direction=-1, movement_mm=self.limit_backoff_mm, mm_per_sec=5)
         # Display status
         if not suppress_message:
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # initial fast retract
-        self.increment_stepper(direction=-1, movement_mm=self.FAST_RETRACT_MM, mm_per_sec=5)
-        self.FAST_RETRACT_MM = 0
+        #self.increment_stepper(direction=-1, movement_mm=self.FAST_RETRACT_MM, mm_per_sec=5)
+        #self.FAST_RETRACT_MM = 0
         # increment backwards until near limit triggered:
-        while not self.NEAR_LIMIT_TRIGGERED:
-            self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=5)
+        #while not self.NEAR_LIMIT_TRIGGERED:
+        #    self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=5)
+        self.increment_stepper(direction=-1, movement_mm=self.max_movement_mm, mm_per_sec=5)
         # finally back off near limit switch     
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=6)
         self.HOME = True
