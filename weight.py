@@ -186,8 +186,8 @@ class Stringer():
                     # The stepper remains energized in the current position
                     self.MODE = "calibrating"
                 else:
-                    self.go_home()
                     self.MODE = "resting"
+                    self.go_home()
 
     def calibrate(self):
         """
