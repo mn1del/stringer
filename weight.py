@@ -159,8 +159,6 @@ class Stringer():
         while self.MODE == "tensioning":
             print("Move: {:,.3f}mm, Cumulative movement: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
                 self.MOVEMENT, cumulative_movement, self.CURRENT_KGS, self.target_kgs))
-            #self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
-            #self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.CURRENT_KGS), self.lcd.LCD_LINE_2)
 
             if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
                 self.MODE = "resting"
