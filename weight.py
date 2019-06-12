@@ -354,7 +354,7 @@ class Stringer():
                    pulls the pin HIGH. Otherwise, the pin is wired to ground and pulled LOW by default.
         """
         while self.RUN_THREADS:
-            time.sleep(0.005)
+            time.sleep(0.01)
             self.NEAR_LIMIT_TRIGGERED = self.near_limit_switch.STATE
             self.FAR_LIMIT_TRIGGERED = self.far_limit_switch.STATE
 #            if self.limit_switch_triggered(self.near_limit_switch):
