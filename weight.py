@@ -122,6 +122,7 @@ class Stringer():
         with the rotary encoder. Then just awaits a button press to either start
         tensioning or calibrating
         """
+        self.BUTTON_PRESSED = False
         # initialize rot.COUNTER
         self.rot.COUNTER = self.TARGET_KGS * 10
         # HOME the tensioner if necessary
@@ -166,7 +167,7 @@ class Stringer():
             print("Move: {:,.3f}mm, Cumulative movement: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
                 self.MOVEMENT, cumulative_movement, self.CURRENT_KGS, self.TARGET_KGS))
 
-            if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED | self.BUTTON_PRESSED:
+            if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
                 self.MODE = "resting"
                 self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
@@ -197,6 +198,7 @@ class Stringer():
         Step 3: calculate and save calibration factors. Update instance variables. 
         Step 4: Set MODE to "resting"
         """
+        self.BUTTON_PRESSED = False
         calibration_step = 0  # Step 0 requires a known weight
         counter = self.rot.COUNTER  # get initial rotary encoder COUNTER value
         cal_readings = []  # to be populated with len==2 list of [known_weight, raw_reading] 
@@ -263,6 +265,7 @@ class Stringer():
                                    Default zero results in no initial far limit backoff
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
+        self.BUTTON_PRESSED = False
         # Display status
         if not suppress_message:
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
