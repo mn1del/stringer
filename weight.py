@@ -185,8 +185,12 @@ class Stringer():
                 if self.rot.BUTTON_LONG_PRESS:
                     # The stepper remains energized in the current position
                     self.MODE = "calibrating"
+                    self.lcd.lcd_string("turn to tension", self.lcd.LCD_LINE_1)
+                    self.lcd.lcd_string("and press", self.lcd.LCD_LINE_2)
                 else:
                     self.MODE = "resting"
+                    self.lcd.lcd_string("Target: {:,.1f} kgs".format(self.TARGET_KGS), self.lcd.LCD_LINE_1)
+                    self.lcd.lcd_string("press to tension", self.lcd.LCD_LINE_2)
                     self.go_home()
 
     def calibrate(self):
