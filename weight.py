@@ -25,11 +25,10 @@ class Stringer():
         # setup hardware
         GPIO.setmode(GPIO.BCM)
         self.n_obs = 5
-        self.target_kgs = 25.0
+        self.TARGET_KGS = 25.0
         self.stall_safe_kgs = 20  # only increment safe fast retract distance if the weight is less than this
-        self.FAST_RETRACT_MM = 0  # safe distance to travel when going home (function of speed and weight)
         self.movement_mm = 0.05  # distance to increment the leadscrew
-        self.max_movement_mm = 100
+        self.MAX_MOVEMENT_MM = 100
         self.limit_backoff_mm = 10  # distance to back off the limit switch when triggered
         self.leadscrew_lead = 2
         self.stepper_full_steps_per_rev = 200
@@ -41,7 +40,7 @@ class Stringer():
                 clk=18,
                 dt=15,
                 button=14,
-                counter=self.target_kgs*10,
+                counter=self.TARGET_KGS*10,
                 long_press_secs=1.0,
                 debounce_n=2)
         self.button = self.rot.BUTTON_LAST_PRESS
@@ -121,7 +120,7 @@ class Stringer():
         tensioning or calibrating
         """
         # initialize rot.COUNTER
-        self.rot.COUNTER = self.target_kgs * 10
+        self.rot.COUNTER = self.TARGET_KGS * 10
         # HOME the tensioner if necessary
         if not self.HOME:
             self.go_home()
@@ -131,9 +130,9 @@ class Stringer():
         # start loop
         while self.MODE == "resting":
             # control target_kgs with the rotary encoder
-            self.target_kgs = self.rot.COUNTER/10
+            self.TARGET_KGS = self.rot.COUNTER/10
             # display target_kgs
-            self.lcd.lcd_string("Target: {:,.1f} kgs".format(self.target_kgs), self.lcd.LCD_LINE_1)
+            self.lcd.lcd_string("Target: {:,.1f} kgs".format(self.TARGET_KGS), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("press to tension", self.lcd.LCD_LINE_2)
             # check for change in MODE
             if self.rot.BUTTON_LAST_PRESS != self.button:
@@ -149,7 +148,8 @@ class Stringer():
         target_kgs can be dynamically managed with the rotary encoder.
         """
         print("In tensioning mode")
-        self.rot.COUNTER = self.target_kgs*10
+        self.BUTTON_PRESSED = False
+        self.rot.COUNTER = self.TARGET_KGS*10
         cumulative_movement = 0
         # start supplementary threads
         movement_thread = threading.Thread(target=self.calc_tensioning_movement)
@@ -159,7 +159,7 @@ class Stringer():
         
         while self.MODE == "tensioning":
             print("Move: {:,.3f}mm, Cumulative movement: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
-                self.MOVEMENT, cumulative_movement, self.CURRENT_KGS, self.target_kgs))
+                self.MOVEMENT, cumulative_movement, self.CURRENT_KGS, self.TARGET_KGS))
 
             if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
                 self.MODE = "resting"
@@ -168,23 +168,20 @@ class Stringer():
                 time.sleep(0.5)
                 self.go_home()
             else:  # tighten/loosen
-                if self.CURRENT_KGS < self.target_kgs:
-                    cumulative_movement += self.MOVEMENT
-                    if (self.CURRENT_KGS <= self.stall_safe_kgs):
-                        self.FAST_RETRACT_MM += self.MOVEMENT
-                    self.increment_stepper(1, self.MOVEMENT, mm_per_sec=4)
-                elif self.CURRENT_KGS > self.target_kgs:
-                    cumulative_movement += self.MOVEMENT
-                    self.FAST_RETRACT_MM += self.MOVEMENT
-                    self.increment_stepper(-1, self.MOVEMENT, mm_per_sec=4)
-            if self.rot.BUTTON_LAST_PRESS != self.button:
-                self.button = self.rot.BUTTON_LAST_PRESS
-                if self.rot.BUTTON_LONG_PRESS:
-                    # The stepper remains energized in the current position
-                    self.MODE = "calibrating"
-                else:
-                    self.go_home()
-                    self.MODE = "resting"
+                if self.CURRENT_KGS < self.TARGET_KGS:
+                    #cumulative_movement += self.MOVEMENT
+                    self.increment_stepper(1, self.MAX_MOVEMENT_MM, mm_per_sec=4)
+                elif self.CURRENT_KGS > self.TARGET_KGS:
+                    #cumulative_movement += self.MOVEMENT
+                    self.increment_stepper(-1, self.MAX_MOVEMENT_MM, mm_per_sec=4)
+#            if self.rot.BUTTON_LAST_PRESS != self.button:
+#                self.button = self.rot.BUTTON_LAST_PRESS
+#                if self.rot.BUTTON_LONG_PRESS:
+#                    # The stepper remains energized in the current position
+#                    self.MODE = "calibrating"
+#                else:
+#                    self.go_home()
+#                    self.MODE = "resting"
 
     def calibrate(self):
         """
@@ -261,20 +258,12 @@ class Stringer():
                                    Default zero results in no initial far limit backoff
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
-        # initial back off from far limit switch:
-        #if self.FAR_LIMIT_TRIGGERED:
-        #    self.increment_stepper(direction=-1, movement_mm=self.limit_backoff_mm, mm_per_sec=5)
         # Display status
         if not suppress_message:
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
-        # initial fast retract
-        #self.increment_stepper(direction=-1, movement_mm=self.FAST_RETRACT_MM, mm_per_sec=5)
-        #self.FAST_RETRACT_MM = 0
         # increment backwards until near limit triggered:
-        #while not self.NEAR_LIMIT_TRIGGERED:
-        #    self.increment_stepper(direction=-1, movement_mm=0.5, mm_per_sec=5)
-        self.increment_stepper(direction=-1, movement_mm=self.max_movement_mm, mm_per_sec=5)
+        self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=5)
         # finally back off near limit switch     
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=6)
         self.HOME = True
@@ -294,14 +283,14 @@ class Stringer():
         Monitors NEAR_LIMIT_TRIGGERED when stepping backwards
         Returns True if safe to continue stepping, else False.
         """
-        return not self.NEAR_LIMIT_TRIGGERED
+        return not self.NEAR_LIMIT_TRIGGERED | self.BUTTON_PRESSED
     
     def continue_stepping_dir1(self):
         """
         Monitors FAR_LIMIT_TRIGGERED, and CURRENT_KGS vs target_kgs when stepping forwards
         Returns True if safe to continue stepping, else False.
         """
-        return not (self.FAR_LIMIT_TRIGGERED | bool(self.CURRENT_KGS > self.target_kgs))
+        return not (self.FAR_LIMIT_TRIGGERED | bool(self.CURRENT_KGS > self.TARGET_KGS) | self.BUTTON_PRESSED)
 
 
     def increment_stepper(self, direction, movement_mm, mm_per_sec=5):
@@ -372,12 +361,12 @@ class Stringer():
 
     def calc_tensioning_movement(self):
         """
-        Constantly calculates next movement_mm, depending on self.MODE, self.CURRENT_KGS, and self.target_kgs.
+        Constantly calculates next movement_mm, depending on self.MODE, self.CURRENT_KGS, and self.TARGET_KGS.
         Runs in its own thread to reduce latency between stepper motor commands.
         """
-        movement_factor = 10 * self.target_kgs
+        movement_factor = 10 * self.TARGET_KGS
         while self.RUN_THREADS:
-            movement_factor = max(0.5, min(movement_factor*1.2, abs(self.CURRENT_KGS - self.target_kgs)*10))
+            movement_factor = max(0.5, min(movement_factor*1.2, abs(self.CURRENT_KGS - self.TARGET_KGS)*10))
             if self.CURRENT_KGS >= 22:
                 movement = min(0.5, 0.05 * movement_factor)
             else:    
@@ -385,14 +374,30 @@ class Stringer():
             self.MOVEMENT = movement    
             time.sleep(0.1)
 
+    def monitor_tensioning_button(self):
+        """
+        Runs in a separate thread during tensioning to update self.button and self.TARGET_KGS
+        based on self.rot.BUTTON_LAST_PRESS and self.rot.COUNTER
+        """
+        if self.rot.BUTTON_LAST_PRESS != self.button:
+            self.button = self.rot.BUTTON_LAST_PRESS
+            self.BUTTON_PRESSED = True
+            if self.rot.BUTTON_LONG_PRESS:
+                # The stepper remains energized in the current position
+                self.MODE = "calibrating"
+            else:
+                self.go_home()
+                self.MODE = "resting"
+
+
     def tensioning_helper_thread(self):
         """
         Designed to dynamically display tension data in a separate thread while the motor runs in the main
         thread. 
         """
         while (self.RUN_THREADS) & (self.MODE == "tensioning"):
-            self.target_kgs = max(0,min(500, self.rot.COUNTER))/10
-            self.lcd.lcd_string("Target: {:,.1f} kg".format(self.target_kgs), self.lcd.LCD_LINE_1)
+            self.TARGET_KGS = max(0,min(500, self.rot.COUNTER))/10
+            self.lcd.lcd_string("Target: {:,.1f} kg".format(self.TARGET_KGS), self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("Actual: {:,.1f} kg".format(self.CURRENT_KGS), self.lcd.LCD_LINE_2)
             time.sleep(0.5)
         
