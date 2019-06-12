@@ -325,18 +325,6 @@ class Stringer():
                 rpm=rpm,
                 use_ramp=True,
                 continue_func=continue_funcs[direction])
-#        if (direction==1) & (self.FAR_LIMIT_TRIGGERED==False):
-#            self.stepper.step(
-#                    n_steps=n_steps,
-#                    direction=direction,
-#                    rpm=rpm,
-#                    use_ramp=True)
-#        elif (direction==0) & (self.NEAR_LIMIT_TRIGGERED==False):
-#            self.stepper.step(
-#                    n_steps=n_steps,
-#                    direction=direction,
-#                    rpm=rpm,
-#                    use_ramp=True)
         self.HOME = False
 
     def limit_switch_triggered(self, limit_switch):
@@ -360,18 +348,23 @@ class Stringer():
     def monitor_limit_switches(self):
         """
         Constantly monitors the state of the limit switches. Sets the 
-        state of self.NEAR_LIMIT_TRIGGERED and self.FAR_LIMIT_TRIGGERED accordingly
+        state of self.NEAR_LIMIT_TRIGGERED and self.FAR_LIMIT_TRIGGERED accordingly.
+        Logic is consistent with a normally closed switch with internal pullup.
+            - i.e. when triggered the normally closed loop is broken and the internal pull-up
+                   pulls the pin HIGH. Otherwise, the pin is wired to ground and pulled LOW by default.
         """
         while self.RUN_THREADS:
             time.sleep(0.005)
-            if self.limit_switch_triggered(self.near_limit_switch):
-                self.NEAR_LIMIT_TRIGGERED = True
-            else:    
-                self.NEAR_LIMIT_TRIGGERED = False
-            if self.limit_switch_triggered(self.far_limit_switch):
-                self.FAR_LIMIT_TRIGGERED = True
-            else:    
-                self.FAR_LIMIT_TRIGGERED = False
+            self.NEAR_LIMIT_TRIGGERED = self.near_limit_switch.STATE
+            self.FAR_LIMIT_TRIGGERED = self.far_limit_switch.STATE
+#            if self.limit_switch_triggered(self.near_limit_switch):
+#                self.NEAR_LIMIT_TRIGGERED = True
+#            else:    
+#                self.NEAR_LIMIT_TRIGGERED = False
+#            if self.limit_switch_triggered(self.far_limit_switch):
+#                self.FAR_LIMIT_TRIGGERED = True
+#            else:    
+#                self.FAR_LIMIT_TRIGGERED = False
 
     def monitor_current_kgs(self):
         """
