@@ -179,7 +179,8 @@ class Stringer():
                     self.increment_stepper(1, self.MAX_MOVEMENT_MM, mm_per_sec=4)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
                     #cumulative_movement += self.MOVEMENT
-                    self.increment_stepper(-1, self.MAX_MOVEMENT_MM, mm_per_sec=4)
+                    self.increment_stepper(-1, 0.5, mm_per_sec=4)
+                    #self.increment_stepper(-1, self.MAX_MOVEMENT_MM, mm_per_sec=4)
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
@@ -381,7 +382,7 @@ class Stringer():
             movement_factor = max(0.5, min(movement_factor*1.2, abs(self.CURRENT_KGS - self.TARGET_KGS)*10))
             if self.CURRENT_KGS >= 22:
                 movement = min(0.5, 0.05 * movement_factor)
-            else:    
+            else:    mgn12h
                 movement = 0.1 * movement_factor
             self.MOVEMENT = movement    
             time.sleep(0.1)
