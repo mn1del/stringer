@@ -164,8 +164,8 @@ class Stringer():
         tensioning_lcd_thread.start()
         
         while bool(self.MODE == "tensioning"):
-            print("Move: {:,.3f}mm, Cumulative movement: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
-                self.MOVEMENT, cumulative_movement, self.CURRENT_KGS, self.TARGET_KGS))
+            #print("Move: {:,.3f}mm, Cumulative movement: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
+            #    self.MOVEMENT, cumulative_movement, self.CURRENT_KGS, self.TARGET_KGS))
 
             if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
                 self.MODE = "resting"
@@ -368,6 +368,7 @@ class Stringer():
         """
         while self.RUN_THREADS:
             raw = self.hx.get_reading(n_obs=3, clip=True)
+            print(raw)
             kgs = max(0,(raw - self.cal_offset) / self.cal_factor)
             self.CURRENT_KGS = kgs
             time.sleep(0.25)
