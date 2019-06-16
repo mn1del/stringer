@@ -382,7 +382,7 @@ class Stringer():
             movement_factor = max(0.5, min(movement_factor*1.2, abs(self.CURRENT_KGS - self.TARGET_KGS)*10))
             if self.CURRENT_KGS >= 22:
                 movement = min(0.5, 0.05 * movement_factor)
-            else:    mgn12h
+            else:
                 movement = 0.1 * movement_factor
             self.MOVEMENT = movement    
             time.sleep(0.1)
