@@ -180,9 +180,9 @@ class Stringer():
                 self.go_home()
             else:  # tighten/loosen
                 if self.CURRENT_KGS < self.TARGET_KGS:
-                    self.increment_stepper(1, self.MAX_MOVEMENT_MM, mm_per_sec=7)
+                    self.increment_stepper(1, self.MAX_MOVEMENT_MM, mm_per_sec=5)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
-                    self.increment_stepper(-1, 0.5, mm_per_sec=4)
+                    self.increment_stepper(-1, 0.1, mm_per_sec=4)
             if self.BUTTON_PRESSED:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
