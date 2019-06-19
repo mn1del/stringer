@@ -27,7 +27,6 @@ class Stringer():
         GPIO.setmode(GPIO.BCM)
         self.n_obs = 5
         self.TARGET_KGS = 25.0
-        self.MAX_KG = 50
         self.stall_safe_kgs = 20  # only increment safe fast retract distance if the weight is less than this
         self.movement_mm = 0.05  # distance to increment the leadscrew
         self.MAX_MOVEMENT_MM = 100
@@ -323,7 +322,7 @@ class Stringer():
         Monitors FAR_LIMIT_TRIGGERED, and CURRENT_KGS vs target_kgs when stepping forwards
         Returns True if safe to continue stepping, else False.
         """
-        return not (self.FAR_LIMIT_TRIGGERED | bool(self.CURRENT_KGS > self.TARGET_KGS) | self.BUTTON_PRESSED, bool(self.CURRENT_KGS > self.MAX_KG))
+        return not (self.FAR_LIMIT_TRIGGERED | bool(self.CURRENT_KGS > self.TARGET_KGS) | self.BUTTON_PRESSED | bool(self.CURRENT_KGS > self.MAX_KG))
 
 
     def increment_stepper(self, direction, movement_mm, mm_per_sec, max_kg_limit=50):
