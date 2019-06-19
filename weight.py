@@ -97,10 +97,13 @@ class Stringer():
             self.go_home() 
             while True:
                 if self.MODE == "resting":
+                    kgs_thread.join()
                     self.rest()
                 elif self.MODE == "tensioning":
+                    kgs_thread.start()
                     self.tension()
                 elif self.MODE == "calibrating":
+                    kgs_thread.start()
                     self.calibrate()
                 else:
                     print("Unknown mode!")
