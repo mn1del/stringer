@@ -188,7 +188,7 @@ class Stringer():
                     time.sleep(movement_pause)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
                     movement_mm = 0.2
-                    movement_pause = 0.25
+                    movement_pause = 0.1
                     self.increment_stepper(-1, movement_mm, mm_per_sec=3)
                     time.sleep(movement_pause)
             if self.BUTTON_PRESSED:
