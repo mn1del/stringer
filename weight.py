@@ -183,13 +183,15 @@ class Stringer():
                 time.sleep(0.5)
                 self.go_home()
             else:  # tighten/loosen
-                if self.CURRENT_KGS < self.TARGET_KGS:
-                    self.increment_stepper(1, movement_mm, mm_per_sec=4)
+                if bool(self.CURRENT_KGS < self.TARGET_KGS):
+                    self.increment_stepper(1, movement_mm, mm_per_sec=10, max_kg_limit=20)
+                    self.increment_stepper(1, movement_mm, mm_per_sec=7, max_kg_limit=23)
+                    self.increment_stepper(1, movement_mm, mm_per_sec=3)
                     time.sleep(movement_pause)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
                     movement_mm = 0.2
                     movement_pause = 0.25
-                    self.increment_stepper(-1, movement_mm, mm_per_sec=4)
+                    self.increment_stepper(-1, movement_mm, mm_per_sec=3)
                     time.sleep(movement_pause)
             if self.BUTTON_PRESSED:
                 self.button = self.rot.BUTTON_LAST_PRESS
@@ -239,11 +241,9 @@ class Stringer():
                 else:
                     if self.rot.COUNTER < counter:
                         direction = -1
-                        #self.increment_stepper(direction, self.movement_mm)
                         self.increment_stepper(direction, 0.1, mm_per_sec=4)
                     elif self.rot.COUNTER > counter:
                         direction = 1
-                        #self.increment_stepper(direction, self.movement_mm)
                         self.increment_stepper(direction, 0.1, mm_per_sec=4)
                     counter = self.rot.COUNTER
                     if self.rot.BUTTON_LAST_PRESS != self.button:
@@ -325,7 +325,7 @@ class Stringer():
         return not (self.FAR_LIMIT_TRIGGERED | bool(self.CURRENT_KGS > self.TARGET_KGS) | self.BUTTON_PRESSED)
 
 
-    def increment_stepper(self, direction, movement_mm, mm_per_sec=5):
+    def increment_stepper(self, direction, movement_mm, mm_per_sec, max_kg_limit=50):
         """
         Helper function to increment the leadscrew forwards.
         Sets HOME to False, to register that the position has changed.
@@ -341,7 +341,7 @@ class Stringer():
         direction = int((direction + 1) / 2)  # convert to 0|1   
         n_steps = int(self.stepper_full_steps_per_rev * self.microstep_mode * movement_mm
                 / self.leadscrew_lead)
-        continue_funcs = [self.continue_stepping_dir0, self.continue_stepping_dir1]
+        continue_funcs = [self.continue_stepping_dir0, lambda: bool(self.CURRENT_KGS < max_kg_limit) | self.continue_stepping_dir1]
         self.stepper.step(
                 n_steps=n_steps,
                 direction=direction,
