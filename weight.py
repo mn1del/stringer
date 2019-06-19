@@ -180,7 +180,7 @@ class Stringer():
             else:  # tighten/loosen
                 if self.CURRENT_KGS < self.TARGET_KGS:
                     #cumulative_movement += self.MOVEMENT
-                    self.increment_stepper(1, self.MAX_MOVEMENT_MM, mm_per_sec=6)
+                    self.increment_stepper(1, self.MAX_MOVEMENT_MM, mm_per_sec=7)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
                     #cumulative_movement += self.MOVEMENT
                     self.increment_stepper(-1, 0.5, mm_per_sec=4)
