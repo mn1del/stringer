@@ -180,7 +180,7 @@ class Stringer():
             else:  # tighten/loosen
                 if self.CURRENT_KGS < self.TARGET_KGS:
                     #cumulative_movement += self.MOVEMENT
-                    self.increment_stepper(1, self.MAX_MOVEMENT_MM, mm_per_sec=4)
+                    self.increment_stepper(1, self.MAX_MOVEMENT_MM, mm_per_sec=6)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
                     #cumulative_movement += self.MOVEMENT
                     self.increment_stepper(-1, 0.5, mm_per_sec=4)
@@ -289,7 +289,7 @@ class Stringer():
         # increment backwards until near limit triggered:
         self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=7)
         # finally back off near limit switch     
-        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=6)
+        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=7)
         self.HOME = True
         
     def raw_to_kgs(self, raw):
