@@ -97,13 +97,10 @@ class Stringer():
             self.go_home() 
             while True:
                 if self.MODE == "resting":
-                    kgs_thread.join()
                     self.rest()
                 elif self.MODE == "tensioning":
-                    kgs_thread.start()
                     self.tension()
                 elif self.MODE == "calibrating":
-                    kgs_thread.start()
                     self.calibrate()
                 else:
                     print("Unknown mode!")
@@ -290,7 +287,7 @@ class Stringer():
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # increment backwards until near limit triggered:
-        self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=5)
+        self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=4)
         # finally back off near limit switch     
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=6)
         self.HOME = True
