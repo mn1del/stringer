@@ -322,7 +322,7 @@ class Stringer():
         Monitors FAR_LIMIT_TRIGGERED, and CURRENT_KGS vs target_kgs when stepping forwards
         Returns True if safe to continue stepping, else False.
         """
-        return not (self.FAR_LIMIT_TRIGGERED | bool(self.CURRENT_KGS > self.TARGET_KGS) | self.BUTTON_PRESSED)
+        return not (self.FAR_LIMIT_TRIGGERED | bool(self.CURRENT_KGS > self.TARGET_KGS) | self.BUTTON_PRESSED, bool(self.CURRENT_KGS > self.MAX_KG))
 
 
     def increment_stepper(self, direction, movement_mm, mm_per_sec, max_kg_limit=50):
@@ -337,11 +337,12 @@ class Stringer():
                      Defaults to self.movement_mm
         mm_per_sec: (int) determines inter step pause length             
         """
+        self.MAX_KG = max_kg_limit
         rpm = 60 * mm_per_sec/self.leadscrew_lead    
         direction = int((direction + 1) / 2)  # convert to 0|1   
         n_steps = int(self.stepper_full_steps_per_rev * self.microstep_mode * movement_mm
                 / self.leadscrew_lead)
-        continue_funcs = [self.continue_stepping_dir0, lambda: bool(self.CURRENT_KGS < max_kg_limit) | self.continue_stepping_dir1()]
+        continue_funcs = [self.continue_stepping_dir0, self.continue_stepping_dir1]
         self.stepper.step(
                 n_steps=n_steps,
                 direction=direction,
