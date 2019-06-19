@@ -170,8 +170,6 @@ class Stringer():
         button_thread.start()
         tensioning_lcd_thread = threading.Thread(target=self.tensioning_lcd_thread)
         tensioning_lcd_thread.start()
-        # initial move
-        self.increment_stepper(1, 40, mm_per_sec=10)
         
         while bool(self.MODE == "tensioning"):
             if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
@@ -185,7 +183,7 @@ class Stringer():
             else:  # tighten/loosen
                 if bool(self.CURRENT_KGS < self.TARGET_KGS):
                     self.increment_stepper(1, movement_mm, mm_per_sec=10, max_kg_limit=20)
-                    self.increment_stepper(1, movement_mm, mm_per_sec=7, max_kg_limit=23)
+                    self.increment_stepper(1, movement_mm, mm_per_sec=7, max_kg_limit=25)
                     self.increment_stepper(1, movement_mm, mm_per_sec=3)
                     time.sleep(movement_pause)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
