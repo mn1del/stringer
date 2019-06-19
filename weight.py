@@ -162,8 +162,6 @@ class Stringer():
         # start supplementary threads
         button_thread = threading.Thread(target=self.monitor_tensioning_button)
         button_thread.start()
-        #movement_thread = threading.Thread(target=self.calc_tensioning_movement)
-        #movement_thread.start()
         tensioning_lcd_thread = threading.Thread(target=self.tensioning_lcd_thread)
         tensioning_lcd_thread.start()
         
@@ -381,25 +379,11 @@ class Stringer():
         """
         while self.RUN_THREADS:
             raw = self.hx.get_reading(n_obs=3, clip=True)
+            print(raw)
             kgs = max(0,(raw - self.cal_offset) / self.cal_factor)
             self.CURRENT_KGS = kgs
-            print("{:,.f} kgs (target: {:,.1f})".format(kgs, self.TARGET_KGS))
+            print("{:,.f} kgs (target: {:,.1f})".format(self.CURRENT_KGS, self.TARGET_KGS))
             time.sleep(0.25)
-
-    def calc_tensioning_movement(self):
-        """
-        Constantly calculates next movement_mm, depending on self.MODE, self.CURRENT_KGS, and self.TARGET_KGS.
-        Runs in its own thread to reduce latency between stepper motor commands.
-        """
-        movement_factor = 10 * self.TARGET_KGS
-        while self.RUN_THREADS:
-            movement_factor = max(0.5, min(movement_factor*1.2, abs(self.CURRENT_KGS - self.TARGET_KGS)*10))
-            if self.CURRENT_KGS >= 22:
-                movement = min(0.5, 0.05 * movement_factor)
-            else:
-                movement = 0.1 * movement_factor
-            self.MOVEMENT = movement    
-            time.sleep(0.1)
 
     def monitor_tensioning_button(self):
         """
@@ -408,14 +392,7 @@ class Stringer():
         """
         while (self.RUN_THREADS) & bool(self.MODE == "tensioning"):
             if self.rot.BUTTON_LAST_PRESS != self.button:
-                #self.button = self.rot.BUTTON_LAST_PRESS
                 self.BUTTON_PRESSED = True
-                #if self.rot.BUTTON_LONG_PRESS:
-                    # The stepper remains energized in the current position
-                #    self.MODE = "calibrating"
-                #else:
-                #    self.go_home()
-                #    self.MODE = "resting"
             time.sleep(0.2)        
 
     def tensioning_lcd_thread(self):
