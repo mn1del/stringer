@@ -163,7 +163,7 @@ class Stringer():
         self.BUTTON_PRESSED = False
         self.rot.COUNTER = self.TARGET_KGS*10
         cumulative_movement = 0
-        movement_mm = self.MAX_MOVEMENT_MM
+        movement_mm = 100#self.MAX_MOVEMENT_MM
         movement_pause = 0
         # start supplementary threads
         button_thread = threading.Thread(target=self.monitor_tensioning_button)
@@ -341,7 +341,7 @@ class Stringer():
         direction = int((direction + 1) / 2)  # convert to 0|1   
         n_steps = int(self.stepper_full_steps_per_rev * self.microstep_mode * movement_mm
                 / self.leadscrew_lead)
-        continue_funcs = [self.continue_stepping_dir0, lambda: bool(self.CURRENT_KGS < max_kg_limit) | self.continue_stepping_dir1]
+        continue_funcs = [self.continue_stepping_dir0, lambda: bool(self.CURRENT_KGS < max_kg_limit) | self.continue_stepping_dir1()]
         self.stepper.step(
                 n_steps=n_steps,
                 direction=direction,
