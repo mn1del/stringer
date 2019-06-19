@@ -380,8 +380,8 @@ class Stringer():
         while self.RUN_THREADS:
             raw = self.hx.get_reading(n_obs=3, clip=True)
             kgs = max(0,(raw - self.cal_offset) / self.cal_factor)
-            print("{:,.1f}".format(kgs))
             self.CURRENT_KGS = kgs
+            print("{:,.1f}".format(self.CURRENT_KGS))
             #print("{:,.f} kgs (target: {:,.1f})".format(self.CURRENT_KGS, self.TARGET_KGS))
             time.sleep(0.25)
 
