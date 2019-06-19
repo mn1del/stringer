@@ -109,7 +109,7 @@ class Stringer():
             self.RUN_THREADS = False
             limit_thread.join()
             kgs_thread.join()
-            time.sleep(2)
+            time.sleep(1.5)
             self.stepper.sleep()
             self.lcd.clear_screen()
             print("Something went wrong in the master loop")
@@ -119,7 +119,7 @@ class Stringer():
             self.RUN_THREADS = False
             limit_thread.join()
             kgs_thread.join()
-            time.sleep(2)
+            time.sleep(1.5)
             self.stepper.sleep()
             self.lcd.clear_screen()
             GPIO.cleanup()
