@@ -223,8 +223,9 @@ class Stringer():
             while bool(calibration_step == 0):  # Control tension directly
                 self.lcd.lcd_string("turn to tension", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("and press", self.lcd.LCD_LINE_2)
-                if (self.limit_switch_triggered(self.near_limit_switch)) \
-                        | (self.limit_switch_triggered(self.far_limit_switch)):
+                #if (self.limit_switch_triggered(self.near_limit_switch)) \
+                        #        | (self.limit_switch_triggered(self.far_limit_switch)):
+                if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
                     self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
                     self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
                     time.sleep(0.5)
@@ -233,10 +234,12 @@ class Stringer():
                 else:
                     if self.rot.COUNTER < counter:
                         direction = -1
-                        self.increment_stepper(direction, self.movement_mm)
+                        #self.increment_stepper(direction, self.movement_mm)
+                        self.increment_stepper(direction, 0.1, mm_per_sec=4)
                     elif self.rot.COUNTER > counter:
                         direction = 1
-                        self.increment_stepper(direction, self.movement_mm)
+                        #self.increment_stepper(direction, self.movement_mm)
+                        self.increment_stepper(direction, 0.1, mm_per_sec=4)
                     counter = self.rot.COUNTER
                     if self.rot.BUTTON_LAST_PRESS != self.button:
                         self.button = self.rot.BUTTON_LAST_PRESS
@@ -289,7 +292,7 @@ class Stringer():
         # increment backwards until near limit triggered:
         self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=10)
         # finally back off near limit switch     
-        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=7)
+        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=10)
         self.HOME = True
         
     def raw_to_kgs(self, raw):
