@@ -92,6 +92,8 @@ class Stringer():
             kgs_thread = threading.Thread(target=self.monitor_current_kgs)
             kgs_thread.start()
             # go to the home location of the tensioner
+            # pause first to allow the threads to start
+            time.sleep(0.5)
             self.go_home() 
             while True:
                 if self.MODE == "resting":
@@ -380,8 +382,8 @@ class Stringer():
         while self.RUN_THREADS:
             raw = self.hx.get_reading(n_obs=3, clip=True)
             kgs = max(0,(raw - self.cal_offset) / self.cal_factor)
-            print("{:,.f} kgs (target: {:,.1f})".format(kgs, self.TARGET_KGS))
             self.CURRENT_KGS = kgs
+            print("{:,.f} kgs (target: {:,.1f})".format(kgs, self.TARGET_KGS))
             time.sleep(0.25)
 
     def calc_tensioning_movement(self):
