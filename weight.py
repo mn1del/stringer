@@ -163,6 +163,7 @@ class Stringer():
         self.BUTTON_PRESSED = False
         self.rot.COUNTER = self.TARGET_KGS*10
         cumulative_movement = 0
+        movement_mm = self.MAX_MOVEMENT_MM
         # start supplementary threads
         button_thread = threading.Thread(target=self.monitor_tensioning_button)
         button_thread.start()
@@ -180,9 +181,10 @@ class Stringer():
                 self.go_home()
             else:  # tighten/loosen
                 if self.CURRENT_KGS < self.TARGET_KGS:
-                    self.increment_stepper(1, self.MAX_MOVEMENT_MM, mm_per_sec=5)
+                    self.increment_stepper(1, movement_mm, mm_per_sec=5)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
-                    self.increment_stepper(-1, 0.1, mm_per_sec=4)
+                    movement_mm = 0.1
+                    self.increment_stepper(-1, movement_mm, mm_per_sec=4)
             if self.BUTTON_PRESSED:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
