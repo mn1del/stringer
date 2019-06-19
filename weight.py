@@ -107,6 +107,8 @@ class Stringer():
         except Exception:
             # code to cleanup here
             self.RUN_THREADS = False
+            limit_thread.join()
+            kgs_thread.join()
             time.sleep(2)
             self.stepper.sleep()
             self.lcd.clear_screen()
@@ -115,6 +117,8 @@ class Stringer():
             pass
         finally:
             self.RUN_THREADS = False
+            limit_thread.join()
+            kgs_thread.join()
             time.sleep(2)
             self.stepper.sleep()
             self.lcd.clear_screen()
@@ -166,9 +170,6 @@ class Stringer():
         tensioning_lcd_thread.start()
         
         while bool(self.MODE == "tensioning"):
-            #print("Move: {:,.3f}mm, Cumulative movement: {:,.3f}mm, Kgs: {:,.2f}, target: {:,.2f}".format(
-            #    self.MOVEMENT, cumulative_movement, self.CURRENT_KGS, self.TARGET_KGS))
-
             if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
                 self.MODE = "resting"
                 tensioning_lcd_thread.join()
@@ -179,13 +180,9 @@ class Stringer():
                 self.go_home()
             else:  # tighten/loosen
                 if self.CURRENT_KGS < self.TARGET_KGS:
-                    #cumulative_movement += self.MOVEMENT
                     self.increment_stepper(1, self.MAX_MOVEMENT_MM, mm_per_sec=7)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
-                    #cumulative_movement += self.MOVEMENT
                     self.increment_stepper(-1, 0.5, mm_per_sec=4)
-                    #self.increment_stepper(-1, self.MAX_MOVEMENT_MM, mm_per_sec=4)
-            #if self.rot.BUTTON_LAST_PRESS != self.button:
             if self.BUTTON_PRESSED:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
@@ -290,9 +287,9 @@ class Stringer():
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # increment backwards until near limit triggered:
-        self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=10)
+        self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=8)
         # finally back off near limit switch     
-        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=10)
+        self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=8)
         self.HOME = True
         
     def raw_to_kgs(self, raw):
