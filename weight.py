@@ -85,7 +85,7 @@ class Stringer():
         Start the logic loop
         """
         try:
-            # start threads:
+            # start  limit switch and HX711 threads:
             self.RUN_THREADS = True
             limit_thread = threading.Thread(target=self.monitor_limit_switches)
             limit_thread.start()
@@ -105,6 +105,7 @@ class Stringer():
         except Exception:
             # code to cleanup here
             self.RUN_THREADS = False
+            time.sleep(2)
             self.stepper.sleep()
             self.lcd.clear_screen()
             print("Something went wrong in the master loop")
@@ -112,6 +113,7 @@ class Stringer():
             pass
         finally:
             self.RUN_THREADS = False
+            time.sleep(2)
             self.stepper.sleep()
             self.lcd.clear_screen()
             GPIO.cleanup()
@@ -158,9 +160,9 @@ class Stringer():
         # start supplementary threads
         button_thread = threading.Thread(target=self.monitor_tensioning_button)
         button_thread.start()
-        movement_thread = threading.Thread(target=self.calc_tensioning_movement)
-        movement_thread.start()
-        tensioning_lcd_thread = threading.Thread(target=self.tensioning_helper_thread)
+        #movement_thread = threading.Thread(target=self.calc_tensioning_movement)
+        #movement_thread.start()
+        tensioning_lcd_thread = threading.Thread(target=self.tensioning_lcd_thread)
         tensioning_lcd_thread.start()
         
         while bool(self.MODE == "tensioning"):
@@ -169,6 +171,8 @@ class Stringer():
 
             if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
                 self.MODE = "resting"
+                tensioning_lcd_thread.join()
+                button_thread.join()
                 self.lcd.lcd_string("**** Error ****", self.lcd.LCD_LINE_1)
                 self.lcd.lcd_string("** Limit Hit **", self.lcd.LCD_LINE_2)
                 time.sleep(0.5)
@@ -181,15 +185,22 @@ class Stringer():
                     #cumulative_movement += self.MOVEMENT
                     self.increment_stepper(-1, 0.5, mm_per_sec=4)
                     #self.increment_stepper(-1, self.MAX_MOVEMENT_MM, mm_per_sec=4)
-            if self.rot.BUTTON_LAST_PRESS != self.button:
+            #if self.rot.BUTTON_LAST_PRESS != self.button:
+            if self.BUTTON_PRESSED:
                 self.button = self.rot.BUTTON_LAST_PRESS
                 if self.rot.BUTTON_LONG_PRESS:
                     # The stepper remains energized in the current position
                     self.MODE = "calibrating"
+                    tensioning_lcd_thread.join()
+                    button_thread.join()
+                    self.BUTTON_PRESSED = False
                     self.lcd.lcd_string("turn to tension", self.lcd.LCD_LINE_1)
                     self.lcd.lcd_string("and press", self.lcd.LCD_LINE_2)
                 else:
                     self.MODE = "resting"
+                    tensioning_lcd_thread.join()
+                    button_thread.join()
+                    self.BUTTON_PRESSED = False
                     self.lcd.lcd_string("Target: {:,.1f} kgs".format(self.TARGET_KGS), self.lcd.LCD_LINE_1)
                     self.lcd.lcd_string("press to tension", self.lcd.LCD_LINE_2)
                     self.go_home()
@@ -405,7 +416,7 @@ class Stringer():
                 #    self.MODE = "resting"
             time.sleep(0.2)        
 
-    def tensioning_helper_thread(self):
+    def tensioning_lcd_thread(self):
         """
         Designed to dynamically display tension data in a separate thread while the motor runs in the main
         thread. 
