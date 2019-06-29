@@ -185,7 +185,7 @@ class Stringer():
                     self.increment_stepper(1, movement_mm, mm_per_sec=16, max_kg_limit=10)
                     self.increment_stepper(1, movement_mm, mm_per_sec=12, max_kg_limit=15)
                     self.increment_stepper(1, movement_mm, mm_per_sec=6, max_kg_limit=23)
-                    self.increment_stepper(1, movement_mm, mm_per_sec=3)
+                    self.increment_stepper(1, movement_mm, mm_per_sec=2)
                     time.sleep(movement_pause)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
                     movement_mm = 0.2
