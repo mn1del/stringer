@@ -293,12 +293,8 @@ class Stringer():
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # increment backwards until near limit triggered:
-        self.microstep_mode =4 
-        self.stepper.set_microsteps(self.microstep_mode)
-        self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=20)
+        self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=16)
         # finally back off near limit switch     
-        self.microstep_mode = 4 
-        self.stepper.set_microsteps(self.microstep_mode)
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=8)
         self.HOME = True
         
