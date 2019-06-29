@@ -184,7 +184,8 @@ class Stringer():
                 if bool(self.CURRENT_KGS < self.TARGET_KGS):
                     self.increment_stepper(1, movement_mm, mm_per_sec=16, max_kg_limit=10)
                     self.increment_stepper(1, movement_mm, mm_per_sec=12, max_kg_limit=15)
-                    self.increment_stepper(1, movement_mm, mm_per_sec=8, max_kg_limit=25)
+                    #self.increment_stepper(1, movement_mm, mm_per_sec=8, max_kg_limit=20)
+                    self.increment_stepper(1, movement_mm, mm_per_sec=6, max_kg_limit=20)
                     self.increment_stepper(1, movement_mm, mm_per_sec=3)
                     time.sleep(movement_pause)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
@@ -294,7 +295,7 @@ class Stringer():
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # increment backwards until near limit triggered:
-        self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=16)
+        self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=15)
         # finally back off near limit switch     
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=8)
         self.HOME = True
