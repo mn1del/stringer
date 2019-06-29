@@ -182,8 +182,9 @@ class Stringer():
                 self.go_home()
             else:  # tighten/loosen
                 if bool(self.CURRENT_KGS < self.TARGET_KGS):
-                    self.increment_stepper(1, movement_mm, mm_per_sec=16, max_kg_limit=20)
-                    self.increment_stepper(1, movement_mm, mm_per_sec=12, max_kg_limit=25)
+                    self.increment_stepper(1, movement_mm, mm_per_sec=16, max_kg_limit=10)
+                    self.increment_stepper(1, movement_mm, mm_per_sec=12, max_kg_limit=15)
+                    self.increment_stepper(1, movement_mm, mm_per_sec=8, max_kg_limit=25)
                     self.increment_stepper(1, movement_mm, mm_per_sec=3)
                     time.sleep(movement_pause)
                 elif self.CURRENT_KGS > self.TARGET_KGS:
