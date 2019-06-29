@@ -184,7 +184,6 @@ class Stringer():
                 if bool(self.CURRENT_KGS < self.TARGET_KGS):
                     self.increment_stepper(1, movement_mm, mm_per_sec=16, max_kg_limit=10)
                     self.increment_stepper(1, movement_mm, mm_per_sec=12, max_kg_limit=15)
-                    #self.increment_stepper(1, movement_mm, mm_per_sec=8, max_kg_limit=20)
                     self.increment_stepper(1, movement_mm, mm_per_sec=6, max_kg_limit=23)
                     self.increment_stepper(1, movement_mm, mm_per_sec=3)
                     time.sleep(movement_pause)
@@ -295,7 +294,11 @@ class Stringer():
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
             self.lcd.lcd_string("*****HOME******", self.lcd.LCD_LINE_2)
         # increment backwards until near limit triggered:
-        self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=12)
+        self.increment_stepper(-1, movement_mm, mm_per_sec=3, min_kg_limit=23)
+        self.increment_stepper(-1, movement_mm, mm_per_sec=6, min_kg_limit=15)
+        self.increment_stepper(-1, movement_mm, mm_per_sec=12, min_kg_limit=10)
+        self.increment_stepper(-1, movement_mm, mm_per_sec=16)
+        #self.increment_stepper(direction=-1, movement_mm=self.MAX_MOVEMENT_MM, mm_per_sec=12)
         # finally back off near limit switch     
         self.increment_stepper(direction=1, movement_mm=self.limit_backoff_mm, mm_per_sec=8)
         self.HOME = True
@@ -315,17 +318,22 @@ class Stringer():
         Monitors NEAR_LIMIT_TRIGGERED when stepping backwards
         Returns True if safe to continue stepping, else False.
         """
-        return not (self.NEAR_LIMIT_TRIGGERED | self.BUTTON_PRESSED)
+        return not (self.NEAR_LIMIT_TRIGGERED 
+                | self.BUTTON_PRESSED 
+                | bool(self.CURRENT_KGS <= self.MIN_KG))
     
     def continue_stepping_dir1(self):
         """
         Monitors FAR_LIMIT_TRIGGERED, and CURRENT_KGS vs target_kgs when stepping forwards
         Returns True if safe to continue stepping, else False.
         """
-        return not (self.FAR_LIMIT_TRIGGERED | bool(self.CURRENT_KGS > self.TARGET_KGS) | self.BUTTON_PRESSED | bool(self.CURRENT_KGS > self.MAX_KG))
+        return not (self.FAR_LIMIT_TRIGGERED 
+                | bool(self.CURRENT_KGS > self.TARGET_KGS) 
+                | self.BUTTON_PRESSED 
+                | bool(self.CURRENT_KGS > self.MAX_KG))
 
 
-    def increment_stepper(self, direction, movement_mm, mm_per_sec, max_kg_limit=50):
+    def increment_stepper(self, direction, movement_mm, mm_per_sec, max_kg_limit=50, min_kg_limit=0):
         """
         Helper function to increment the leadscrew forwards.
         Sets HOME to False, to register that the position has changed.
@@ -338,6 +346,7 @@ class Stringer():
         mm_per_sec: (int) determines inter step pause length             
         """
         self.MAX_KG = max_kg_limit
+        self.MIN_KG = min_kg_limit
         rpm = 60 * mm_per_sec/self.leadscrew_lead    
         direction = int((direction + 1) / 2)  # convert to 0|1   
         n_steps = int(self.stepper_full_steps_per_rev * self.microstep_mode * movement_mm
