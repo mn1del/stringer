@@ -163,7 +163,7 @@ class Stringer():
         self.BUTTON_PRESSED = False
         self.rot.COUNTER = self.TARGET_KGS*10
         cumulative_movement = 0
-        movement_mm = 100#self.MAX_MOVEMENT_MM
+        movement_mm = self.MAX_MOVEMENT_MM
         movement_pause = 0
         # start supplementary threads
         button_thread = threading.Thread(target=self.monitor_tensioning_button)
@@ -289,6 +289,7 @@ class Stringer():
             suppress_message: (bool) If True, do not display "RETURNING HOME" status                        
         """
         self.BUTTON_PRESSED = False
+        movement_mm = self.MAX_MOVEMENT_MM
         # Display status
         if not suppress_message:
             self.lcd.lcd_string("***RETURNING***", self.lcd.LCD_LINE_1)
