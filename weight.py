@@ -86,19 +86,15 @@ class Stringer():
         """
         try:
             # start  limit switch and HX711 threads:
-            print("Marker 1")
             self.RUN_THREADS = True
             limit_thread = threading.Thread(target=self.monitor_limit_switches)
             limit_thread.start()
-            print("Marker 2")
             kgs_thread = threading.Thread(target=self.monitor_current_kgs)
             kgs_thread.start()
-            print("Marker 3")
             # go to the home location of the tensioner
             # pause first to allow the threads to start
             time.sleep(0.5)
             self.go_home() 
-            print("Marker 4")
             while True:
                 if self.MODE == "resting":
                     self.rest()
@@ -177,6 +173,7 @@ class Stringer():
         
         while bool(self.MODE == "tensioning"):
             if self.NEAR_LIMIT_TRIGGERED | self.FAR_LIMIT_TRIGGERED:
+                print("TRIGGERED!")
                 self.MODE = "resting"
                 tensioning_lcd_thread.join()
                 button_thread.join()
@@ -416,6 +413,7 @@ class Stringer():
         while (self.RUN_THREADS) & bool(self.MODE == "tensioning"):
             if self.rot.BUTTON_LAST_PRESS != self.button:
                 self.BUTTON_PRESSED = True
+                print("PRESS!!")
             time.sleep(0.2)        
 
     def tensioning_lcd_thread(self):
